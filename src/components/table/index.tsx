@@ -18,6 +18,7 @@ import {
   Chip,
   Stack,
   Box,
+  Button,
 } from "@mui/material";
 import {
   createColumnHelper,
@@ -34,28 +35,41 @@ const columns = [
   columnHelper.accessor("fullName", {
     header: "User",
     cell: (props) => (
-      <Box sx={{ display: "flex", gap: 3 }}>
-        <Stack>
-          <Typography>{props.getValue()}</Typography>
-          <span>{props.row.original["username"]}</span>
-          <span>{props.row.original["id"]}</span>
-        </Stack>
-        {!props.row.original["active"] && (
-          <Chip label="inactive" size="small" color="default" />
-        )}
-      </Box>
+      <Stack>
+        <Box>
+          <Typography variant="body1" sx={{ display: "inline-block" }}>
+            {props.getValue()}
+          </Typography>
+          {!props.row.original["active"] && (
+            <Chip
+              label="inactive"
+              size="small"
+              color="info"
+              sx={{ display: "inline", ml: 1 }}
+            />
+          )}
+        </Box>
+        <Typography variant="body2">
+          {props.row.original["username"]}
+        </Typography>
+        <Typography variant="caption" color="#777">{props.row.original["id"]}</Typography>
+      </Stack>
     ),
   }),
   columnHelper.accessor("email", {
     header: "E-mail",
-    cell: (props) => props.getValue(),
+    cell: (props) => (
+      <Typography variant="body2">{props.getValue()}</Typography>
+    ),
   }),
   columnHelper.accessor("group.name", {
     header: "Group",
     cell: (props) => (
       <Stack>
-        <span>{props.getValue()}</span>
-        <span>{props.row.original["group"]["id"]}</span>
+        <Typography variant="body1">{props.getValue()}</Typography>
+        <Typography variant="caption" color="#777">
+          {props.row.original["group"]["id"]}
+        </Typography>
       </Stack>
     ),
   }),
@@ -63,14 +77,26 @@ const columns = [
     header: "Organization",
     cell: (props) => (
       <Stack>
-        <span>{props.getValue()}</span>
-        <span>{props.row.original["org"]["id"]}</span>
+        <Typography variant="body1">{props.getValue()}</Typography>
+        <Typography variant="caption" color="#777">
+          {props.row.original["org"]["id"]}
+        </Typography>
       </Stack>
     ),
   }),
   columnHelper.accessor("remark", {
     header: "Remark",
-    cell: (props) => props.getValue(),
+    cell: (props) => (
+      <Typography variant="body2">{props.getValue()}</Typography>
+    ),
+  }),
+  columnHelper.display({
+    id: "actions",
+    cell: (props) => (
+      <Button onClick={() => console.log(JSON.stringify(props.row))}>
+        hello
+      </Button>
+    ),
   }),
 ];
 
