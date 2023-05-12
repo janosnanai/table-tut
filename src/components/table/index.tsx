@@ -16,10 +16,12 @@ import {
   Typography,
   Paper,
   Chip,
+  Divider,
   Stack,
   Box,
   Button,
   Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import {
   createColumnHelper,
@@ -141,6 +143,7 @@ const defaultData = [] as User[];
 function UsersTable() {
   const [pagination, setPagination] = useState(initialPagination);
   const [rowSelection, setRowSelection] = useState({});
+  const [columnVisibility, setColumnVisibility] = useState({});
 
   const { data: usersData } = useGetUsersQuery(pagination);
 
@@ -151,9 +154,11 @@ function UsersTable() {
     state: {
       pagination,
       rowSelection,
+      columnVisibility,
     },
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     manualPagination: true,
     enableRowSelection: true,
     enableMultiRowSelection: true,
@@ -177,6 +182,29 @@ function UsersTable() {
 
   return (
     <Box>
+      <p>{JSON.stringify(table.getState())}</p>
+      <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
+        <Stack>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={table.getIsAllColumnsVisible()}
+                indeterminate={table.getIsSomeColumnsVisible()}
+              />
+            }
+            label="column visibility"
+          />
+          <Divider orientation="horizontal" />
+          {table.getAllLeafColumns().map((col) => {
+            return (
+              <FormControlLabel
+                control={<Checkbox checked={col.getIsVisible()} />}
+                label={col.id}
+              />
+            );
+          })}
+        </Stack>
+      </Paper>
       <h1>users</h1>
       <TableContainer component={Paper} elevation={3}>
         <Table stickyHeader>
