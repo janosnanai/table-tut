@@ -4,27 +4,28 @@ import { useQuery } from "@tanstack/react-query";
 
 import { API_ENTRYPOINT } from "../config";
 
-interface Params {
-  limit: number;
-  page: number;
+interface Options {
+  pageIndex: number;
+  pageSize: number;
 }
 
-async function queryFn(params: Params) {
+async function queryFn(options: Options) {
   const url = `${API_ENTRYPOINT}/users${
-    params
-      ? "?limit=" + params.limit.toString() + "&page=" + params.page.toString()
+    options
+      ? "?limit=" +
+        options.pageSize.toString() +
+        "&page=" +
+        options.pageIndex.toString()
       : ""
   }`;
-
-  console.log("🚀 ~ file: useGetUsersQuery.ts:18 ~ queryFn ~ url:", url);
 
   const data = await fetch(url);
 
   return data.json();
 }
 
-export default (params: Params) =>
+export default (options: Options) =>
   useQuery<UsersPage>({
-    queryKey: ["users", params],
-    queryFn: () => queryFn(params),
+    queryKey: ["users", options],
+    queryFn: () => queryFn(options),
   });

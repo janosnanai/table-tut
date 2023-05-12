@@ -40,9 +40,11 @@ export const handlers = [
     return res(
       ctx.status(200),
       ctx.json({
-        count,
-        page: formattedPage,
-        limit: formattedLimit,
+        pagination: {
+          count,
+          index: formattedPage,
+          limit: formattedLimit,
+        },
         data: paginatedUsers,
       })
     );
@@ -60,8 +62,10 @@ export const handlers = [
 ];
 
 export type UsersPage = {
-  count: number;
-  page: number;
-  limit: number;
+  pagination: {
+    count: number;
+    index: number;
+    limit: number;
+  };
   data: User[];
 };

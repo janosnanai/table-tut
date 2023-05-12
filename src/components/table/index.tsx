@@ -52,7 +52,9 @@ const columns = [
         <Typography variant="body2">
           {props.row.original["username"]}
         </Typography>
-        <Typography variant="caption" color="#777">{props.row.original["id"]}</Typography>
+        <Typography variant="caption" color="#777">
+          {props.row.original["id"]}
+        </Typography>
       </Stack>
     ),
   }),
@@ -100,31 +102,39 @@ const columns = [
   }),
 ];
 
-const initialFilter = {
-  page: 0,
-  limit: PAGE_LIMITS[0],
+const initialPagination = {
+  pageIndex: 0,
+  pageSize: PAGE_LIMITS[0],
 };
 
-function UsersTable() {
-  const [filter, setFilter] = useState(initialFilter);
+const defaultData = [] as User[];
 
-  const { data: usersData } = useGetUsersQuery(filter);
+function UsersTable() {
+  const [pagination, setPagination] = useState(initialPagination);
+
+  const { data: usersData } = useGetUsersQuery(pagination);
 
   const table = useReactTable({
-    data: usersData?.data || [],
+    data: usersData?.data || defaultData,
     columns,
+    pageCount: usersData?.pagination.count,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
+    manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
   });
 
   function handlePageChange(_e: unknown, update: number) {
-    setFilter((prev) => ({ ...prev, page: update }));
+    table.setPageIndex(update);
   }
 
   function handleRowsPerPageChange(
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     const update = parseInt(e.target.value);
-    setFilter((prev) => ({ ...prev, page: 0, limit: update }));
+    table.setPageSize(update);
   }
 
   if (!usersData) return <div>{":(..."}</div>;
@@ -163,11 +173,13 @@ function UsersTable() {
         <TablePagination
           rowsPerPageOptions={PAGE_LIMITS}
           component="div"
-          count={usersData?.count || 0}
-          rowsPerPage={filter.limit}
-          page={filter.page}
+          count={usersData?.pagination.count || 0}
+          rowsPerPage={pagination.pageSize}
+          page={pagination.pageIndex}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
+          showFirstButton
+          showLastButton
         />
       </TableContainer>
     </Box>
