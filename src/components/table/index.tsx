@@ -190,6 +190,7 @@ function UsersTable() {
               <Checkbox
                 checked={table.getIsAllColumnsVisible()}
                 indeterminate={table.getIsSomeColumnsVisible()}
+                onChange={table.getToggleAllColumnsVisibilityHandler()}
               />
             }
             label="column visibility"
@@ -198,7 +199,12 @@ function UsersTable() {
           {table.getAllLeafColumns().map((col) => {
             return (
               <FormControlLabel
-                control={<Checkbox checked={col.getIsVisible()} />}
+                control={
+                  <Checkbox
+                    checked={col.getIsVisible()}
+                    onChange={col.getToggleVisibilityHandler()}
+                  />
+                }
                 label={col.id}
               />
             );
