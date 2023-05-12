@@ -19,11 +19,13 @@ import {
   Stack,
   Box,
   Button,
+  Checkbox,
 } from "@mui/material";
 import {
   createColumnHelper,
   useReactTable,
   getCoreRowModel,
+  getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
 
@@ -32,6 +34,24 @@ import useGetUsersQuery from "../../hooks/useGetUsersQuery";
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
+  columnHelper.display({
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        onChange={table.getToggleAllRowsSelectedHandler()}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        disabled={!row.getCanSelect()}
+        indeterminate={row.getIsSomeSelected()}
+        onChange={row.getToggleSelectedHandler()}
+      />
+    ),
+  }),
   columnHelper.accessor("fullName", {
     header: "User",
     cell: (props) => (
@@ -111,6 +131,7 @@ const defaultData = [] as User[];
 
 function UsersTable() {
   const [pagination, setPagination] = useState(initialPagination);
+  const [rowSelection, setRowSelection] = useState({});
 
   const { data: usersData } = useGetUsersQuery(pagination);
 
@@ -120,10 +141,16 @@ function UsersTable() {
     pageCount: usersData?.pagination.count,
     state: {
       pagination,
+      rowSelection,
     },
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
     manualPagination: true,
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getRowId: (row) => row.id,
   });
 
   function handlePageChange(_e: unknown, update: number) {
