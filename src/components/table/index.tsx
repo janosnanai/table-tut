@@ -52,6 +52,15 @@ const columns = [
       />
     ),
   }),
+  columnHelper.display({
+    id: "index",
+    header: "#",
+    cell: ({ row, table }) =>
+      row.index +
+      1 +
+      table.getState().pagination.pageIndex *
+        table.getState().pagination.pageSize,
+  }),
   columnHelper.accessor("fullName", {
     header: "User",
     cell: (props) => (
