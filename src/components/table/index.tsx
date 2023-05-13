@@ -65,6 +65,7 @@ const columns = [
   }),
   columnHelper.accessor("fullName", {
     header: "User",
+    id: "User",
     cell: (props) => (
       <Stack>
         <Box>
@@ -91,12 +92,14 @@ const columns = [
   }),
   columnHelper.accessor("email", {
     header: "E-mail",
+    id: "E-mail",
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
   columnHelper.accessor("group.name", {
     header: "Group",
+    id: "Group",
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -108,6 +111,7 @@ const columns = [
   }),
   columnHelper.accessor("org.name", {
     header: "Organization",
+    id: "Organization",
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -119,6 +123,7 @@ const columns = [
   }),
   columnHelper.accessor("remark", {
     header: "Remark",
+    id: "Remark",
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
