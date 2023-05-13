@@ -19,6 +19,7 @@ import {
   Divider,
   Stack,
   Box,
+  Container,
   Button,
   Checkbox,
   FormControlLabel,
@@ -195,79 +196,85 @@ function UsersTable() {
   if (!usersData) return <div>{":(..."}</div>;
 
   return (
-    <Box>
-      <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
-        <Stack>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={table.getIsAllColumnsVisible()}
-                indeterminate={
-                  table.getIsSomeColumnsVisible() &&
-                  !table.getIsAllColumnsVisible()
-                }
-                onChange={table.getToggleAllColumnsVisibilityHandler()}
-              />
-            }
-            label="column visibility"
+    <Box sx={{ background: "#ddd" }}>
+      <Container>
+        <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
+          <Stack>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={table.getIsAllColumnsVisible()}
+                  indeterminate={
+                    table.getIsSomeColumnsVisible() &&
+                    !table.getIsAllColumnsVisible()
+                  }
+                  onChange={table.getToggleAllColumnsVisibilityHandler()}
+                />
+              }
+              label="column visibility"
+            />
+            <Divider orientation="horizontal" />
+            {table.getAllLeafColumns().map((col) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={col.getIsVisible()}
+                      disabled={!col.getCanHide()}
+                      onChange={col.getToggleVisibilityHandler()}
+                    />
+                  }
+                  label={col.id}
+                  key={col.id}
+                />
+              );
+            })}
+          </Stack>
+        </Paper>
+        <TableContainer component={Paper} elevation={3}>
+          <Table stickyHeader>
+            <TableHead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableCell key={header.id}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TablePagination
+            rowsPerPageOptions={PAGE_LIMITS}
+            component="div"
+            count={usersData?.pagination.count || 0}
+            rowsPerPage={pagination.pageSize}
+            page={pagination.pageIndex}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            showFirstButton
+            showLastButton
           />
-          <Divider orientation="horizontal" />
-          {table.getAllLeafColumns().map((col) => {
-            return (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={col.getIsVisible()}
-                    disabled={!col.getCanHide()}
-                    onChange={col.getToggleVisibilityHandler()}
-                  />
-                }
-                label={col.id}
-              />
-            );
-          })}
-        </Stack>
-      </Paper>
-      <TableContainer component={Paper} elevation={3}>
-        <Table stickyHeader>
-          <TableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={PAGE_LIMITS}
-          component="div"
-          count={usersData?.pagination.count || 0}
-          rowsPerPage={pagination.pageSize}
-          page={pagination.pageIndex}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          showFirstButton
-          showLastButton
-        />
-      </TableContainer>
+        </TableContainer>
+      </Container>
     </Box>
   );
 }
