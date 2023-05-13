@@ -182,14 +182,16 @@ function UsersTable() {
 
   return (
     <Box>
-      <p>{JSON.stringify(table.getState())}</p>
       <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
         <Stack>
           <FormControlLabel
             control={
               <Checkbox
                 checked={table.getIsAllColumnsVisible()}
-                indeterminate={table.getIsSomeColumnsVisible()}
+                indeterminate={
+                  table.getIsSomeColumnsVisible() &&
+                  !table.getIsAllColumnsVisible()
+                }
                 onChange={table.getToggleAllColumnsVisibilityHandler()}
               />
             }
