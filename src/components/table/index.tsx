@@ -37,7 +37,8 @@ const columnHelper = createColumnHelper<User>();
 
 const columns = [
   columnHelper.display({
-    id: "select",
+    id: "Select",
+    enableHiding: false,
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -55,7 +56,8 @@ const columns = [
     ),
   }),
   columnHelper.display({
-    id: "index",
+    id: "Index",
+    enableHiding: false,
     header: "#",
     cell: ({ row, table }) =>
       row.index +
@@ -66,6 +68,7 @@ const columns = [
   columnHelper.accessor("fullName", {
     header: "User",
     id: "User",
+    enableHiding: false,
     cell: (props) => (
       <Stack>
         <Box>
@@ -93,6 +96,7 @@ const columns = [
   columnHelper.accessor("email", {
     header: "E-mail",
     id: "E-mail",
+    enableHiding: true,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -100,6 +104,7 @@ const columns = [
   columnHelper.accessor("group.name", {
     header: "Group",
     id: "Group",
+    enableHiding: true,
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -112,6 +117,7 @@ const columns = [
   columnHelper.accessor("org.name", {
     header: "Organization",
     id: "Organization",
+    enableHiding: true,
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -124,12 +130,15 @@ const columns = [
   columnHelper.accessor("remark", {
     header: "Remark",
     id: "Remark",
+    enableHiding: true,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
   columnHelper.display({
-    id: "actions",
+    header: "Actions",
+    id: "Actions",
+    enableHiding: false,
     cell: (props) => (
       <Button onClick={() => console.log(JSON.stringify(props.row))}>
         hello
@@ -209,6 +218,7 @@ function UsersTable() {
                 control={
                   <Checkbox
                     checked={col.getIsVisible()}
+                    disabled={!col.getCanHide()}
                     onChange={col.getToggleVisibilityHandler()}
                   />
                 }
@@ -218,7 +228,6 @@ function UsersTable() {
           })}
         </Stack>
       </Paper>
-      <h1>users</h1>
       <TableContainer component={Paper} elevation={3}>
         <Table stickyHeader>
           <TableHead>
