@@ -42,11 +42,18 @@ import {
 
 import useGetUsersQuery from "../../hooks/useGetUsersQuery";
 
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends unknown, TValue> {
+    name?: string;
+  }
+}
+
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
   columnHelper.display({
-    id: "Select",
+    id: "select",
+    meta: { name: "Select" },
     enableHiding: false,
     enableSorting: false,
     header: ({ table }) => (
@@ -66,7 +73,8 @@ const columns = [
     ),
   }),
   columnHelper.display({
-    id: "Index",
+    id: "index",
+    meta: { name: "Index" },
     enableHiding: false,
     enableSorting: false,
     header: "#",
@@ -78,7 +86,7 @@ const columns = [
   }),
   columnHelper.accessor("fullName", {
     header: "User",
-    id: "User",
+    meta: { name: "User" },
     enableHiding: false,
     enableSorting: true,
     cell: (props) => (
@@ -107,7 +115,7 @@ const columns = [
   }),
   columnHelper.accessor("email", {
     header: "E-mail",
-    id: "E-mail",
+    meta: { name: "E-mail" },
     enableHiding: true,
     enableSorting: true,
     cell: (props) => (
@@ -116,7 +124,7 @@ const columns = [
   }),
   columnHelper.accessor("group.name", {
     header: "Group",
-    id: "Group",
+    meta: { name: "Group" },
     enableHiding: true,
     enableSorting: true,
     cell: (props) => (
@@ -130,7 +138,7 @@ const columns = [
   }),
   columnHelper.accessor("org.name", {
     header: "Organization",
-    id: "Organization",
+    meta: { name: "Organization" },
     enableHiding: true,
     enableSorting: true,
     cell: (props) => (
@@ -144,7 +152,7 @@ const columns = [
   }),
   columnHelper.accessor("remark", {
     header: "Remark",
-    id: "Remark",
+    meta: { name: "Remark" },
     enableHiding: true,
     enableSorting: false,
     cell: (props) => (
@@ -153,7 +161,7 @@ const columns = [
   }),
   columnHelper.display({
     header: "Actions",
-    id: "Actions",
+    meta: { name: "Actions" },
     enableHiding: false,
     enableSorting: false,
     cell: (props) => (
@@ -195,6 +203,7 @@ function UsersTable() {
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     manualPagination: true,
+    manualSorting: true,
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
@@ -245,13 +254,16 @@ function UsersTable() {
                       onChange={col.getToggleVisibilityHandler()}
                     />
                   }
-                  label={col.id}
+                  label={col.columnDef.meta?.name || col.id}
                   key={col.id}
                 />
               );
             })}
           </Stack>
         </Paper>
+
+        {/* <p>{JSON.stringify(sorting)}</p> */}
+
         <TableContainer component={Paper} elevation={3}>
           <Table stickyHeader>
             <TableHead>
