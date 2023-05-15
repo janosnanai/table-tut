@@ -9,7 +9,7 @@ import type { User } from "../../mocks/db";
 
 import { useState } from "react";
 
-import { PAGE_LIMITS } from "../../config";
+import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
 
 import {
   Table,
@@ -19,6 +19,7 @@ import {
   TableHead,
   TableRow,
   TablePagination,
+  TableSortLabel,
   Typography,
   Paper,
   Chip,
@@ -258,10 +259,21 @@ function UsersTable() {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableCell key={header.id}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      <Stack direction="row">
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getCanSort() && (
+                          <TableSortLabel
+                            active={!!header.column.getIsSorted()}
+                            direction={
+                              header.column.getIsSorted() || SORT_DIRECTION.ASC
+                            }
+                            onClick={header.column.getToggleSortingHandler()}
+                          />
+                        )}
+                      </Stack>
                     </TableCell>
                   ))}
                 </TableRow>
