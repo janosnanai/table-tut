@@ -1,4 +1,10 @@
 import type { ChangeEvent } from "react";
+import type {
+  VisibilityState,
+  PaginationState,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import type { User } from "../../mocks/db";
 
 import { useState } from "react";
@@ -26,10 +32,11 @@ import {
 } from "@mui/material";
 import {
   createColumnHelper,
-  useReactTable,
+  flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  flexRender,
+  getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 
 import useGetUsersQuery from "../../hooks/useGetUsersQuery";
@@ -40,6 +47,7 @@ const columns = [
   columnHelper.display({
     id: "Select",
     enableHiding: false,
+    enableSorting: false,
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -59,6 +67,7 @@ const columns = [
   columnHelper.display({
     id: "Index",
     enableHiding: false,
+    enableSorting: false,
     header: "#",
     cell: ({ row, table }) =>
       row.index +
@@ -70,6 +79,7 @@ const columns = [
     header: "User",
     id: "User",
     enableHiding: false,
+    enableSorting: true,
     cell: (props) => (
       <Stack>
         <Box>
@@ -98,6 +108,7 @@ const columns = [
     header: "E-mail",
     id: "E-mail",
     enableHiding: true,
+    enableSorting: true,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -106,6 +117,7 @@ const columns = [
     header: "Group",
     id: "Group",
     enableHiding: true,
+    enableSorting: true,
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -119,6 +131,7 @@ const columns = [
     header: "Organization",
     id: "Organization",
     enableHiding: true,
+    enableSorting: true,
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -132,6 +145,7 @@ const columns = [
     header: "Remark",
     id: "Remark",
     enableHiding: true,
+    enableSorting: false,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -140,6 +154,7 @@ const columns = [
     header: "Actions",
     id: "Actions",
     enableHiding: false,
+    enableSorting: false,
     cell: (props) => (
       <Button onClick={() => console.log(JSON.stringify(props.row))}>
         hello
@@ -156,9 +171,11 @@ const initialPagination = {
 const defaultData = [] as User[];
 
 function UsersTable() {
-  const [pagination, setPagination] = useState(initialPagination);
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnVisibility, setColumnVisibility] = useState({});
+  const [pagination, setPagination] =
+    useState<PaginationState>(initialPagination);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const { data: usersData } = useGetUsersQuery(pagination);
 
@@ -167,18 +184,21 @@ function UsersTable() {
     columns,
     pageCount: usersData?.pagination.count,
     state: {
+      columnVisibility,
       pagination,
       rowSelection,
-      columnVisibility,
+      sorting,
     },
+    onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
+    onSortingChange: setSorting,
     manualPagination: true,
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,
   });
 
