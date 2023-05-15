@@ -9,8 +9,6 @@ import type { User } from "../../mocks/db";
 
 import { useState } from "react";
 
-import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
-
 import {
   Table,
   TableBody,
@@ -41,6 +39,7 @@ import {
 } from "@tanstack/react-table";
 
 import useGetUsersQuery from "../../hooks/useGetUsersQuery";
+import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends unknown, TValue> {
@@ -186,7 +185,10 @@ function UsersTable() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const { data: usersData } = useGetUsersQuery(pagination);
+  const { data: usersData } = useGetUsersQuery({
+    pagination,
+    sorting: sorting[0],
+  });
 
   const table = useReactTable({
     data: usersData?.data || defaultData,
@@ -262,7 +264,7 @@ function UsersTable() {
           </Stack>
         </Paper>
 
-        {/* <p>{JSON.stringify(sorting)}</p> */}
+        <p>{JSON.stringify(sorting)}</p>
 
         <TableContainer component={Paper} elevation={3}>
           <Table stickyHeader>

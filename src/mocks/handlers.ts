@@ -3,12 +3,14 @@ import type { User } from "./db";
 import { rest } from "msw";
 import db from "./db";
 
-import { API_ENTRYPOINT, PAGE_LIMITS } from "../config";
+import { API_ENTRYPOINT, PAGE_LIMITS, SORT_DIRECTION } from "../config";
 
 export const handlers = [
   rest.get(`${API_ENTRYPOINT}/users`, (req, res, ctx) => {
     const limit = req.url.searchParams.get("limit");
     const page = req.url.searchParams.get("page");
+    const orderBy = req.url.searchParams.get("orderby");
+    const desc = !!req.url.searchParams.get("desc");
 
     let formattedLimit: number;
 
@@ -30,9 +32,29 @@ export const handlers = [
       formattedPage = parseInt(page[0]);
     }
 
+    let formattedOrderBy;
+
+    if (orderBy) {
+      const orderByArr = orderBy.split("_");
+      const formattedOrderBy = {};
+      // for (let i = 0; i < orderByArr.length; i++) {
+      //   formattedOrderBy[orderByArr[i]]
+      // }
+
+      orderByArr.reduce((acc, cur, idx) => {
+        return ((acc[cur as keyof typeof acc] as object | string) =
+          idx === orderByArr.length - 1
+            ? desc
+              ? SORT_DIRECTION.DESC
+              : SORT_DIRECTION.ASC
+            : {});
+      }, formattedOrderBy);
+    }
+
     const paginatedUsers = db.user.findMany({
       take: formattedLimit,
       skip: formattedPage * formattedLimit,
+      orderBy: formattedOrderBy,
     });
 
     const count = db.user.count();
@@ -45,6 +67,7 @@ export const handlers = [
           index: formattedPage,
           limit: formattedLimit,
         },
+        sorting: { id: orderBy, desc },
         data: paginatedUsers,
       })
     );
@@ -67,5 +90,6 @@ export type UsersPage = {
     index: number;
     limit: number;
   };
+  sorting: { id: string; desc: boolean };
   data: User[];
 };

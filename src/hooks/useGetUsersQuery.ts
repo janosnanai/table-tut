@@ -5,17 +5,32 @@ import { useQuery } from "@tanstack/react-query";
 import { API_ENTRYPOINT } from "../config";
 
 interface Options {
-  pageIndex: number;
-  pageSize: number;
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+  };
+  sorting: {
+    id: string;
+    desc: boolean;
+  };
 }
 
 async function queryFn(options: Options) {
   const url = `${API_ENTRYPOINT}/users${
     options
-      ? "?limit=" +
-        options.pageSize.toString() +
-        "&page=" +
-        options.pageIndex.toString()
+      ? "?" +
+        (options.pagination
+          ? "limit=" +
+            options.pagination.pageSize.toString() +
+            "&page=" +
+            options.pagination.pageIndex.toString()
+          : "") +
+        (options.sorting
+          ? "&orderby=" +
+            options.sorting.id +
+            "&desc=" +
+            options.sorting.desc.toString()
+          : "")
       : ""
   }`;
 
