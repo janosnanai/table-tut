@@ -91,7 +91,10 @@ const columns = [
     cell: (props) => (
       <Stack>
         <Box>
-          <Typography variant="body1" sx={{ display: "inline-block" }}>
+          <Typography
+            variant="body1"
+            sx={{ display: "inline-block", fontWeight: 700 }}
+          >
             {props.getValue()}
           </Typography>
           {!props.row.original["active"] && (
@@ -267,7 +270,7 @@ function UsersTable() {
         <p>{JSON.stringify(sorting)}</p>
 
         <TableContainer component={Paper} elevation={3}>
-          <Table stickyHeader>
+          <Table size="small" stickyHeader>
             <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
