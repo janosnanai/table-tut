@@ -1,9 +1,9 @@
 import type { ChangeEvent } from "react";
 import type {
-  VisibilityState,
   PaginationState,
   RowSelectionState,
   SortingState,
+  VisibilityState,
 } from "@tanstack/react-table";
 import type { User } from "../../mocks/db";
 
@@ -27,6 +27,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  TextField,
 } from "@mui/material";
 import {
   createColumnHelper,
@@ -88,6 +89,7 @@ const columns = [
     meta: { name: "User" },
     enableHiding: false,
     enableSorting: true,
+    enableGlobalFilter: true,
     cell: (props) => (
       <Stack>
         <Box>
@@ -120,6 +122,7 @@ const columns = [
     meta: { name: "E-mail" },
     enableHiding: true,
     enableSorting: true,
+    enableGlobalFilter: true,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -143,6 +146,7 @@ const columns = [
     meta: { name: "Organization" },
     enableHiding: true,
     enableSorting: true,
+    enableGlobalFilter: true,
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -157,6 +161,7 @@ const columns = [
     meta: { name: "Remark" },
     enableHiding: true,
     enableSorting: false,
+    enableGlobalFilter: false,
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -187,6 +192,7 @@ function UsersTable() {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const { data: usersData } = useGetUsersQuery({
     pagination,
@@ -199,11 +205,13 @@ function UsersTable() {
     pageCount: usersData?.pagination.count,
     state: {
       columnVisibility,
+      globalFilter,
       pagination,
       rowSelection,
       sorting,
     },
     onColumnVisibilityChange: setColumnVisibility,
+    onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -217,6 +225,10 @@ function UsersTable() {
     getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,
   });
+
+  function handleFilterChange(e: ChangeEvent<HTMLInputElement>) {
+    setGlobalFilter(e.target.value);
+  }
 
   function handlePageChange(_e: unknown, update: number) {
     table.setPageIndex(update);
@@ -266,10 +278,11 @@ function UsersTable() {
               );
             })}
           </Stack>
+          <TextField
+            onChange={handleFilterChange}
+            placeholder="type searchterm..."
+          />
         </Paper>
-
-        <p>{JSON.stringify(sorting)}</p>
-
         <TableContainer component={Paper} elevation={3}>
           <Table size="small" stickyHeader>
             <TableHead>
