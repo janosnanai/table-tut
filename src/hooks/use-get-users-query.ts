@@ -13,6 +13,9 @@ interface Options {
     id: string;
     desc: boolean;
   };
+  filter: {
+    global: string;
+  };
 }
 
 async function queryFn(options: Options) {
@@ -30,7 +33,8 @@ async function queryFn(options: Options) {
             options.sorting.id +
             "&desc=" +
             options.sorting.desc.toString()
-          : "")
+          : "") +
+        (options.filter ? "&st=" + options.filter.global : "")
       : ""
   }`;
 

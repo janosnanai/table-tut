@@ -11,6 +11,7 @@ export const handlers = [
     const page = req.url.searchParams.get("page");
     const orderBy = req.url.searchParams.get("orderby");
     const desc = req.url.searchParams.get("desc") === "true";
+    const searchTerm = req.url.searchParams.get("st");
 
     let formattedLimit: number;
 
@@ -36,7 +37,7 @@ export const handlers = [
 
     if (orderBy) {
       const orderByArr = orderBy.split("_");
-      
+
       formattedOrderBy = {};
 
       orderByArr.reduce((acc, cur, idx) => {
@@ -54,6 +55,11 @@ export const handlers = [
       skip: formattedPage * formattedLimit,
       // @ts-ignore TODO
       orderBy: formattedOrderBy,
+      where: {
+        fullName: {
+          contains: searchTerm || "",
+        },
+      },
     });
 
     const count = db.user.count();

@@ -40,6 +40,7 @@ import {
 } from "@tanstack/react-table";
 
 import useGetUsersQuery from "../../hooks/use-get-users-query";
+import { useTimeout } from "../../hooks/use-timeout";
 import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
 
 declare module "@tanstack/react-table" {
@@ -193,10 +194,16 @@ function UsersTable() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilterInput, setGlobalFilterInput] = useState("");
+
+  const { startTimeout, stopTimeout } = useTimeout(() =>
+    setGlobalFilter(globalFilterInput)
+  );
 
   const { data: usersData } = useGetUsersQuery({
     pagination,
     sorting: sorting[0],
+    filter: { global: globalFilter },
   });
 
   const table = useReactTable({
@@ -215,9 +222,10 @@ function UsersTable() {
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
+    enableRowSelection: true,
+    manualFiltering: true,
     manualPagination: true,
     manualSorting: true,
-    enableRowSelection: true,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -227,11 +235,13 @@ function UsersTable() {
   });
 
   function handleFilterChange(e: ChangeEvent<HTMLInputElement>) {
-    setGlobalFilter(e.target.value);
+    setGlobalFilterInput(e.target.value);
+    startTimeout();
   }
 
   function handlePageChange(_e: unknown, update: number) {
     table.setPageIndex(update);
+    stopTimeout();
   }
 
   function handleRowsPerPageChange(
@@ -239,9 +249,10 @@ function UsersTable() {
   ) {
     const update = parseInt(e.target.value);
     table.setPageSize(update);
+    stopTimeout();
   }
 
-  if (!usersData) return <div>{":(..."}</div>;
+  // if (!usersData) return <div>{":(..."}</div>;
 
   return (
     <Box sx={{ background: "#ddd" }}>
@@ -280,6 +291,7 @@ function UsersTable() {
           </Stack>
           <TextField
             onChange={handleFilterChange}
+            value={globalFilterInput}
             placeholder="type searchterm..."
           />
         </Paper>
