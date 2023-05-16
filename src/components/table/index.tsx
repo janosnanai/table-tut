@@ -8,7 +8,6 @@ import type {
 import type { User } from "../../mocks/db";
 
 import { useState } from "react";
-
 import {
   Table,
   TableBody,

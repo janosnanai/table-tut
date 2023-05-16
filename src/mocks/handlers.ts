@@ -36,10 +36,8 @@ export const handlers = [
 
     if (orderBy) {
       const orderByArr = orderBy.split("_");
+      
       formattedOrderBy = {};
-      // for (let i = 0; i < orderByArr.length; i++) {
-      //   formattedOrderBy[orderByArr[i]]
-      // }
 
       orderByArr.reduce((acc, cur, idx) => {
         return ((acc[cur as keyof typeof acc] as object | string) =
