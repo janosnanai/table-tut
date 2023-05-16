@@ -33,12 +33,13 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
-import useGetUsersQuery from "../../hooks/useGetUsersQuery";
+import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
 
 declare module "@tanstack/react-table" {
@@ -212,6 +213,7 @@ function UsersTable() {
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,

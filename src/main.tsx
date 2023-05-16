@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { CssBaseline } from "@mui/material";
 
-import App from "./App.tsx";
+import App from "./app.tsx";
 import { MODE } from "./config.ts";
 
 const queryClient = new QueryClient();
