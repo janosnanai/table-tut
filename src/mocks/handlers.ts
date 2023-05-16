@@ -10,7 +10,7 @@ export const handlers = [
     const limit = req.url.searchParams.get("limit");
     const page = req.url.searchParams.get("page");
     const orderBy = req.url.searchParams.get("orderby");
-    const desc = !!req.url.searchParams.get("desc");
+    const desc = req.url.searchParams.get("desc") === "true";
 
     let formattedLimit: number;
 
@@ -36,7 +36,7 @@ export const handlers = [
 
     if (orderBy) {
       const orderByArr = orderBy.split("_");
-      const formattedOrderBy = {};
+      formattedOrderBy = {};
       // for (let i = 0; i < orderByArr.length; i++) {
       //   formattedOrderBy[orderByArr[i]]
       // }
@@ -54,6 +54,7 @@ export const handlers = [
     const paginatedUsers = db.user.findMany({
       take: formattedLimit,
       skip: formattedPage * formattedLimit,
+      // @ts-ignore TODO
       orderBy: formattedOrderBy,
     });
 
