@@ -36,7 +36,7 @@ export const handlers = [
     let formattedOrderBy;
 
     if (orderBy) {
-      const orderByArr = orderBy.split("_");
+      const orderByArr = orderBy.split(".");
 
       formattedOrderBy = {};
 

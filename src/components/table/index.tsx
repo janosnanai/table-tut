@@ -5,12 +5,15 @@ import type {
   RowSelectionState,
   SortingState,
   VisibilityState,
+  Header,
+  Column,
+  Table,
 } from "@tanstack/react-table";
 import type { User } from "../../mocks/db";
 
 import { useState } from "react";
 import {
-  Table,
+  Table as MUITable,
   TableBody,
   TableCell,
   TableContainer,
@@ -39,8 +42,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDrag, useDrop } from "react-dnd";
 
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
@@ -89,11 +91,12 @@ const columns = [
         table.getState().pagination.pageSize,
   }),
   columnHelper.accessor("fullName", {
-    header: "User",
+    id: "fullName",
     meta: { name: "User" },
     enableHiding: false,
     enableSorting: true,
     enableGlobalFilter: true,
+    header: "User",
     cell: (props) => (
       <Stack>
         <Box>
@@ -122,20 +125,22 @@ const columns = [
     ),
   }),
   columnHelper.accessor("email", {
-    header: "E-mail",
+    id: "email",
     meta: { name: "E-mail" },
     enableHiding: true,
     enableSorting: true,
     enableGlobalFilter: true,
+    header: "E-mail",
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
   columnHelper.accessor("group.name", {
-    header: "Group",
+    id: "group.name",
     meta: { name: "Group" },
     enableHiding: true,
     enableSorting: true,
+    header: "Group",
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -146,11 +151,12 @@ const columns = [
     ),
   }),
   columnHelper.accessor("org.name", {
-    header: "Organization",
+    id: "org.name",
     meta: { name: "Organization" },
     enableHiding: true,
     enableSorting: true,
     enableGlobalFilter: true,
+    header: "Organization",
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -161,20 +167,22 @@ const columns = [
     ),
   }),
   columnHelper.accessor("remark", {
-    header: "Remark",
+    id: "remark",
     meta: { name: "Remark" },
     enableHiding: true,
     enableSorting: false,
     enableGlobalFilter: false,
+    header: "Remark",
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
   columnHelper.display({
-    header: "Actions",
+    id: "actions",
     meta: { name: "Actions" },
     enableHiding: false,
     enableSorting: false,
+    header: "Actions",
     cell: (props) => (
       <Button onClick={() => console.log(JSON.stringify(props.row))}>
         hello
@@ -190,9 +198,67 @@ const initialPagination = {
 
 const defaultData = [] as User[];
 
+interface ColumnHeaderProps<T> {
+  header: Header<T, unknown>;
+  table: Table<T>;
+}
+
+function ColumnHeader({ header, table }: ColumnHeaderProps<User>) {
+  const { getState, setColumnOrder } = table;
+  const { columnOrder } = getState();
+  const { column } = header;
+
+  const [, dropRef] = useDrop({
+    accept: "column",
+    drop: (draggedColumn: Column<User>) => {
+      const newColumnOrder = reorderColumns(
+        draggedColumn.id,
+        column.id,
+        columnOrder
+      );
+      setColumnOrder(newColumnOrder);
+    },
+  });
+
+  const [{ isDragging }, dragRef, previewRef] = useDrag({
+    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+    item: () => column,
+    type: "column",
+  });
+
+  function reorderColumns(
+    draggedColumnId: string,
+    targetColumnId: string,
+    columnOrder: string[]
+  ): ColumnOrderState {
+    columnOrder.splice(
+      columnOrder.indexOf(targetColumnId),
+      0,
+      columnOrder.splice(columnOrder.indexOf(draggedColumnId), 1)[0]
+    );
+    return [...columnOrder];
+  }
+
+  return (
+    <TableCell ref={dropRef}>
+      <Stack direction="row" ref={previewRef}>
+        {flexRender(column.columnDef.header, header.getContext())}
+        {column.getCanSort() && (
+          <TableSortLabel
+            active={!!column.getIsSorted()}
+            direction={column.getIsSorted() || SORT_DIRECTION.ASC}
+            onClick={column.getToggleSortingHandler()}
+          />
+        )}
+        <Button ref={dragRef}>drag!</Button>
+      </Stack>
+    </TableCell>
+  );
+}
+
 function UsersTable() {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
-    columns.map((col) => col.id as string)
+    getDefaultColumnOrder()
   );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [globalFilter, setGlobalFilter] = useState("");
@@ -241,6 +307,14 @@ function UsersTable() {
     getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,
   });
+
+  function getDefaultColumnOrder() {
+    return columns.map((col) => col.id as string);
+  }
+
+  function resetColumnOrder() {
+    setColumnOrder(getDefaultColumnOrder());
+  }
 
   function handleFilterChange(e: ChangeEvent<HTMLInputElement>) {
     setGlobalFilterInput(e.target.value);
@@ -303,29 +377,35 @@ function UsersTable() {
             placeholder="type searchterm..."
           />
         </Paper>
+        <p>{JSON.stringify(columnOrder)}</p>
         <TableContainer component={Paper} elevation={3}>
-          <Table size="small" stickyHeader>
+          <MUITable size="small" stickyHeader>
             <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableCell key={header.id}>
-                      <Stack direction="row">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {header.column.getCanSort() && (
-                          <TableSortLabel
-                            active={!!header.column.getIsSorted()}
-                            direction={
-                              header.column.getIsSorted() || SORT_DIRECTION.ASC
-                            }
-                            onClick={header.column.getToggleSortingHandler()}
-                          />
-                        )}
-                      </Stack>
-                    </TableCell>
+                    // <TableCell key={header.id}>
+                    //   <Stack direction="row">
+                    //     {flexRender(
+                    //       header.column.columnDef.header,
+                    //       header.getContext()
+                    //     )}
+                    //     {header.column.getCanSort() && (
+                    //       <TableSortLabel
+                    //         active={!!header.column.getIsSorted()}
+                    //         direction={
+                    //           header.column.getIsSorted() || SORT_DIRECTION.ASC
+                    //         }
+                    //         onClick={header.column.getToggleSortingHandler()}
+                    //       />
+                    //     )}
+                    //   </Stack>
+                    // </TableCell>
+                    <ColumnHeader
+                      key={header.id}
+                      header={header}
+                      table={table}
+                    />
                   ))}
                 </TableRow>
               ))}
@@ -344,7 +424,7 @@ function UsersTable() {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+          </MUITable>
           <TablePagination
             rowsPerPageOptions={PAGE_LIMITS}
             component="div"
