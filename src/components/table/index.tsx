@@ -1,5 +1,6 @@
 import type { ChangeEvent } from "react";
 import type {
+  ColumnOrderState,
   PaginationState,
   RowSelectionState,
   SortingState,
@@ -38,6 +39,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
@@ -188,13 +191,16 @@ const initialPagination = {
 const defaultData = [] as User[];
 
 function UsersTable() {
-  const [pagination, setPagination] =
-    useState<PaginationState>(initialPagination);
+  const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
+    columns.map((col) => col.id as string)
+  );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [globalFilterInput, setGlobalFilterInput] = useState("");
+  const [pagination, setPagination] =
+    useState<PaginationState>(initialPagination);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const { startTimeout, stopTimeout } = useTimeout(() =>
     setGlobalFilter(globalFilterInput)
@@ -211,12 +217,14 @@ function UsersTable() {
     columns,
     pageCount: usersData?.pagination.count,
     state: {
+      columnOrder,
       columnVisibility,
       globalFilter,
       pagination,
       rowSelection,
       sorting,
     },
+    onColumnOrderChange: setColumnOrder,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
     onPaginationChange: setPagination,
