@@ -201,9 +201,16 @@ const defaultData = [] as User[];
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
   table: Table<T>;
+  tableColumnIsDragging: string | null;
+  onDragStateChange: (update: string | null) => void;
 }
 
-function ColumnHeader({ header, table }: ColumnHeaderProps<User>) {
+function ColumnHeader({
+  header,
+  table,
+  tableColumnIsDragging,
+  onDragStateChange,
+}: ColumnHeaderProps<User>) {
   const { getState, setColumnOrder } = table;
   const { columnOrder } = getState();
   const { column } = header;
@@ -224,6 +231,7 @@ function ColumnHeader({ header, table }: ColumnHeaderProps<User>) {
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
     item: () => column,
     type: "column",
+    end: handleDragEnd,
   });
 
   function reorderColumns(
@@ -239,19 +247,36 @@ function ColumnHeader({ header, table }: ColumnHeaderProps<User>) {
     return [...columnOrder];
   }
 
+  function handleDragStart() {
+    onDragStateChange(header.id);
+  }
+
+  function handleDragEnd() {
+    onDragStateChange(null);
+  }
+
   return (
-    <TableCell ref={dropRef}>
-      <Stack direction="row" ref={previewRef}>
-        {flexRender(column.columnDef.header, header.getContext())}
-        {column.getCanSort() && (
-          <TableSortLabel
-            active={!!column.getIsSorted()}
-            direction={column.getIsSorted() || SORT_DIRECTION.ASC}
-            onClick={column.getToggleSortingHandler()}
-          />
+    <TableCell
+      onDrag={handleDragStart}
+      ref={dragRef}
+      sx={{ position: "relative" }}
+    >
+      <div ref={previewRef}>
+        <Stack direction="row">
+          {flexRender(column.columnDef.header, header.getContext())}
+          {column.getCanSort() && (
+            <TableSortLabel
+              active={!!column.getIsSorted()}
+              direction={column.getIsSorted() || SORT_DIRECTION.ASC}
+              onClick={column.getToggleSortingHandler()}
+            />
+          )}
+        </Stack>
+      </div>
+      {tableColumnIsDragging !== null &&
+        tableColumnIsDragging !== header.id && (
+          <div ref={dropRef} style={{ position: "absolute", inset: 0 }}></div>
         )}
-        <Button ref={dragRef}>drag!</Button>
-      </Stack>
     </TableCell>
   );
 }
@@ -267,6 +292,9 @@ function UsersTable() {
     useState<PaginationState>(initialPagination);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [tableColumnIsDragging, setTableColumnIsDragging] = useState<
+    string | null
+  >(null);
 
   const { startTimeout, stopTimeout } = useTimeout(() =>
     setGlobalFilter(globalFilterInput)
@@ -334,8 +362,6 @@ function UsersTable() {
     stopTimeout();
   }
 
-  // if (!usersData) return <div>{":(..."}</div>;
-
   return (
     <Box sx={{ background: "#ddd" }}>
       <Container>
@@ -377,6 +403,7 @@ function UsersTable() {
             placeholder="type searchterm..."
           />
         </Paper>
+        <p>{JSON.stringify(tableColumnIsDragging)}</p>
         <p>{JSON.stringify(columnOrder)}</p>
         <TableContainer component={Paper} elevation={3}>
           <MUITable size="small" stickyHeader>
@@ -405,6 +432,8 @@ function UsersTable() {
                       key={header.id}
                       header={header}
                       table={table}
+                      tableColumnIsDragging={tableColumnIsDragging}
+                      onDragStateChange={setTableColumnIsDragging}
                     />
                   ))}
                 </TableRow>
