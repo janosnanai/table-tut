@@ -215,7 +215,6 @@ const defaultData = [] as User[];
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
   table: Table<T>;
-  // draggable: boolean;
   tableColumnDragging: string | null;
   onDragStateChange: (update: string | null) => void;
 }
