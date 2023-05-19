@@ -295,8 +295,10 @@ function ColumnHeader({
             position: "absolute",
             height: "60%",
             top: "20%",
-            right: "8px",
+            right: 0,
             borderRightWidth: "3px",
+            cursor: "col-resize",
+            marginX: 1,
           }}
         />
       </div>
