@@ -1,6 +1,8 @@
 import type { ChangeEvent } from "react";
 import type {
   ColumnOrderState,
+  ColumnResizeMode,
+  ColumnSizingTableState,
   PaginationState,
   RowSelectionState,
   SortingState,
@@ -215,6 +217,8 @@ function ColumnHeader({
   const { columnOrder } = getState();
   const { column } = header;
 
+  const [resizable, setResizable] = useState(false);
+
   const [, dropRef] = useDrop({
     accept: "column",
     drop: (draggedColumn: Column<User>) => {
@@ -255,9 +259,19 @@ function ColumnHeader({
     onDragStateChange(null);
   }
 
+  function handleMouseOver() {
+    setResizable(true);
+  }
+
+  function handleMouseLeave() {
+    setResizable(false);
+  }
+
   return (
     <TableCell
       onDrag={handleDragStart}
+      onMouseOver={handleMouseOver}
+      onMouseLeave={handleMouseLeave}
       ref={dragRef}
       sx={{ position: "relative" }}
     >
@@ -272,6 +286,19 @@ function ColumnHeader({
             />
           )}
         </Stack>
+        <Divider
+          component="div"
+          orientation="vertical"
+          // absolute
+          light={!resizable}
+          sx={{
+            position: "absolute",
+            height: "60%",
+            top: "20%",
+            right: "8px",
+            borderRightWidth: "3px",
+          }}
+        />
       </div>
       {tableColumnDragging !== null && tableColumnDragging !== header.id && (
         <div ref={dropRef} style={{ position: "absolute", inset: 0 }}></div>
@@ -295,6 +322,8 @@ function UsersTable() {
     null
   );
 
+  const columnResizeMode: ColumnResizeMode = "onChange";
+
   const { startTimeout, stopTimeout } = useTimeout(() =>
     setGlobalFilter(globalFilterInput)
   );
@@ -308,6 +337,7 @@ function UsersTable() {
   const table = useReactTable({
     data: usersData?.data || defaultData,
     columns,
+    columnResizeMode,
     pageCount: usersData?.pagination.count,
     state: {
       columnOrder,
