@@ -63,6 +63,7 @@ const columns = [
     id: "select",
     meta: { name: "Select" },
     enableHiding: false,
+    enableResizing: false,
     enableSorting: false,
     header: ({ table }) => (
       <Checkbox
@@ -84,6 +85,7 @@ const columns = [
     id: "index",
     meta: { name: "Index" },
     enableHiding: false,
+    enableResizing: false,
     enableSorting: false,
     header: "#",
     cell: ({ row, table }) =>
@@ -96,6 +98,7 @@ const columns = [
     id: "fullName",
     meta: { name: "User" },
     enableHiding: false,
+    enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
     header: "User",
@@ -130,6 +133,7 @@ const columns = [
     id: "email",
     meta: { name: "E-mail" },
     enableHiding: true,
+    enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
     header: "E-mail",
@@ -141,6 +145,7 @@ const columns = [
     id: "group.name",
     meta: { name: "Group" },
     enableHiding: true,
+    enableResizing: true,
     enableSorting: true,
     header: "Group",
     cell: (props) => (
@@ -156,6 +161,7 @@ const columns = [
     id: "org.name",
     meta: { name: "Organization" },
     enableHiding: true,
+    enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
     header: "Organization",
@@ -172,6 +178,7 @@ const columns = [
     id: "remark",
     meta: { name: "Remark" },
     enableHiding: true,
+    enableResizing: true,
     enableSorting: false,
     enableGlobalFilter: false,
     header: "Remark",
@@ -183,6 +190,7 @@ const columns = [
     id: "actions",
     meta: { name: "Actions" },
     enableHiding: false,
+    enableResizing: false,
     enableSorting: false,
     header: "Actions",
     cell: (props) => (
@@ -264,11 +272,13 @@ function ColumnHeader({
 
   // TODO: make this a state-machine
   function handleMouseOverResizer() {
+    if (!header.column.getCanResize()) return;
     setDraggable(false);
     setResizable(true);
   }
 
   function handleMouseLeaveResizer() {
+    if (!header.column.getCanResize()) return;
     setDraggable(true);
     setResizable(false);
   }
@@ -292,22 +302,24 @@ function ColumnHeader({
             />
           )}
         </Stack>
-        <Divider
-          onMouseOver={handleMouseOverResizer}
-          onMouseLeave={handleMouseLeaveResizer}
-          component="div"
-          orientation="vertical"
-          light={!resizable}
-          sx={{
-            position: "absolute",
-            height: "60%",
-            top: "20%",
-            right: 0,
-            borderRightWidth: "4px",
-            cursor: "col-resize",
-            marginX: 1,
-          }}
-        />
+        {header.column.getCanResize() && (
+          <Divider
+            onMouseOver={handleMouseOverResizer}
+            onMouseLeave={handleMouseLeaveResizer}
+            component="div"
+            orientation="vertical"
+            light={!resizable}
+            sx={{
+              position: "absolute",
+              height: "60%",
+              top: "20%",
+              right: 0,
+              borderRightWidth: "4px",
+              cursor: "col-resize",
+              marginX: 1,
+            }}
+          />
+        )}
       </div>
       {tableColumnDragging !== null && tableColumnDragging !== header.id && (
         <div ref={dropRef} style={{ position: "absolute", inset: 0 }}></div>
