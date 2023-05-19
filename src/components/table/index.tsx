@@ -53,6 +53,7 @@ import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends unknown, TValue> {
     name?: string;
+    draggable?: boolean;
   }
 }
 
@@ -61,7 +62,7 @@ const columnHelper = createColumnHelper<User>();
 const columns = [
   columnHelper.display({
     id: "select",
-    meta: { name: "Select" },
+    meta: { name: "Select", draggable: false },
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -83,7 +84,7 @@ const columns = [
   }),
   columnHelper.display({
     id: "index",
-    meta: { name: "Index" },
+    meta: { name: "Index", draggable: false },
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -96,7 +97,7 @@ const columns = [
   }),
   columnHelper.accessor("fullName", {
     id: "fullName",
-    meta: { name: "User" },
+    meta: { name: "User", draggable: false },
     enableHiding: false,
     enableResizing: true,
     enableSorting: true,
@@ -131,7 +132,7 @@ const columns = [
   }),
   columnHelper.accessor("email", {
     id: "email",
-    meta: { name: "E-mail" },
+    meta: { name: "E-mail", draggable: true },
     enableHiding: true,
     enableResizing: true,
     enableSorting: true,
@@ -143,7 +144,7 @@ const columns = [
   }),
   columnHelper.accessor("group.name", {
     id: "group.name",
-    meta: { name: "Group" },
+    meta: { name: "Group", draggable: true },
     enableHiding: true,
     enableResizing: true,
     enableSorting: true,
@@ -159,7 +160,7 @@ const columns = [
   }),
   columnHelper.accessor("org.name", {
     id: "org.name",
-    meta: { name: "Organization" },
+    meta: { name: "Organization", draggable: true },
     enableHiding: true,
     enableResizing: true,
     enableSorting: true,
@@ -176,7 +177,7 @@ const columns = [
   }),
   columnHelper.accessor("remark", {
     id: "remark",
-    meta: { name: "Remark" },
+    meta: { name: "Remark", draggable: true },
     enableHiding: true,
     enableResizing: true,
     enableSorting: false,
@@ -188,7 +189,7 @@ const columns = [
   }),
   columnHelper.display({
     id: "actions",
-    meta: { name: "Actions" },
+    meta: { name: "Actions", draggable: false },
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -219,7 +220,6 @@ interface ColumnHeaderProps<T> {
 function ColumnHeader({
   header,
   table,
-  // draggable,
   tableColumnDragging,
   onDragStateChange,
 }: ColumnHeaderProps<User>) {
@@ -228,7 +228,9 @@ function ColumnHeader({
   const { column } = header;
 
   const [resizable, setResizable] = useState(false);
-  const [draggable, setDraggable] = useState(true);
+  const [draggable, setDraggable] = useState(
+    header.column.columnDef.meta?.draggable || false
+  );
 
   const [, dropRef] = useDrop({
     accept: "column",
@@ -243,8 +245,12 @@ function ColumnHeader({
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
-    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
-    item: () => column,
+    collect: (monitor) => ({
+      isDragging: header.column.columnDef.meta?.draggable
+        ? monitor.isDragging()
+        : null,
+    }),
+    item: () => (header.column.columnDef.meta?.draggable ? column : null),
     type: "column",
     end: handleDragEnd,
   });
@@ -262,6 +268,7 @@ function ColumnHeader({
     return [...columnOrder];
   }
 
+  // TODO: make this a state-machine
   function handleDragStart() {
     onDragStateChange(header.id);
   }
@@ -270,7 +277,6 @@ function ColumnHeader({
     onDragStateChange(null);
   }
 
-  // TODO: make this a state-machine
   function handleMouseOverResizer() {
     if (!header.column.getCanResize()) return;
     setDraggable(false);
@@ -279,7 +285,7 @@ function ColumnHeader({
 
   function handleMouseLeaveResizer() {
     if (!header.column.getCanResize()) return;
-    setDraggable(true);
+    setDraggable(header.column.columnDef.meta?.draggable || false);
     setResizable(false);
   }
 
@@ -289,8 +295,13 @@ function ColumnHeader({
       onDrag={handleDragStart}
       ref={dragRef}
       sx={{ position: "relative" }}
+      style={{ width: header.getSize() }}
     >
-      <div></div>
+      <div style={{ fontSize: "9px" }}>
+        <div>draggable: {JSON.stringify(draggable)}</div>
+        <div>resizable: {JSON.stringify(resizable)}</div>
+        <div>size: {header.column.getSize()}</div>
+      </div>
       <div ref={previewRef}>
         <Stack direction="row">
           {flexRender(column.columnDef.header, header.getContext())}
@@ -304,6 +315,7 @@ function ColumnHeader({
         </Stack>
         {header.column.getCanResize() && (
           <Divider
+            onMouseDown={header.getResizeHandler()}
             onMouseOver={handleMouseOverResizer}
             onMouseLeave={handleMouseLeaveResizer}
             component="div"
@@ -476,7 +488,10 @@ function UsersTable() {
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: cell.column.getSize() }}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
