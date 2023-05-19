@@ -1,4 +1,4 @@
-import type { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import type {
   ColumnOrderState,
   ColumnResizeMode,
@@ -142,7 +142,17 @@ const columns = [
     enableGlobalFilter: true,
     header: "E-mail",
     cell: (props) => (
-      <Typography variant="body2">{props.getValue()}</Typography>
+      <Typography
+        variant="body2"
+        sx={{
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          maxWidth: props.column.getSize(),
+        }}
+      >
+        {props.getValue()}
+      </Typography>
     ),
   }),
   columnHelper.accessor("group.name", {
@@ -298,11 +308,8 @@ function ColumnHeader({
       ref={dragRef}
       sx={{
         position: "relative",
-        textOverflow: "ellipsis",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
       }}
-      style={{ width: header.getSize() }}
+      style={{ maxWidth: header.getSize() }}
     >
       <div style={{ fontSize: "9px" }}>
         <div>draggable: {JSON.stringify(draggable)}</div>
