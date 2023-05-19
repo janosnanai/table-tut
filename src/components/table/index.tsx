@@ -201,14 +201,14 @@ const defaultData = [] as User[];
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
   table: Table<T>;
-  tableColumnIsDragging: string | null;
+  tableColumnDragging: string | null;
   onDragStateChange: (update: string | null) => void;
 }
 
 function ColumnHeader({
   header,
   table,
-  tableColumnIsDragging,
+  tableColumnDragging,
   onDragStateChange,
 }: ColumnHeaderProps<User>) {
   const { getState, setColumnOrder } = table;
@@ -273,10 +273,9 @@ function ColumnHeader({
           )}
         </Stack>
       </div>
-      {tableColumnIsDragging !== null &&
-        tableColumnIsDragging !== header.id && (
-          <div ref={dropRef} style={{ position: "absolute", inset: 0 }}></div>
-        )}
+      {tableColumnDragging !== null && tableColumnDragging !== header.id && (
+        <div ref={dropRef} style={{ position: "absolute", inset: 0 }}></div>
+      )}
     </TableCell>
   );
 }
@@ -292,9 +291,9 @@ function UsersTable() {
     useState<PaginationState>(initialPagination);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [tableColumnIsDragging, setTableColumnIsDragging] = useState<
-    string | null
-  >(null);
+  const [tableColumnDragging, setTableColumnDragging] = useState<string | null>(
+    null
+  );
 
   const { startTimeout, stopTimeout } = useTimeout(() =>
     setGlobalFilter(globalFilterInput)
@@ -403,7 +402,7 @@ function UsersTable() {
             placeholder="type searchterm..."
           />
         </Paper>
-        <p>{JSON.stringify(tableColumnIsDragging)}</p>
+        <p>{JSON.stringify(tableColumnDragging)}</p>
         <p>{JSON.stringify(columnOrder)}</p>
         <TableContainer component={Paper} elevation={3}>
           <MUITable size="small" stickyHeader>
@@ -411,29 +410,12 @@ function UsersTable() {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    // <TableCell key={header.id}>
-                    //   <Stack direction="row">
-                    //     {flexRender(
-                    //       header.column.columnDef.header,
-                    //       header.getContext()
-                    //     )}
-                    //     {header.column.getCanSort() && (
-                    //       <TableSortLabel
-                    //         active={!!header.column.getIsSorted()}
-                    //         direction={
-                    //           header.column.getIsSorted() || SORT_DIRECTION.ASC
-                    //         }
-                    //         onClick={header.column.getToggleSortingHandler()}
-                    //       />
-                    //     )}
-                    //   </Stack>
-                    // </TableCell>
                     <ColumnHeader
                       key={header.id}
                       header={header}
                       table={table}
-                      tableColumnIsDragging={tableColumnIsDragging}
-                      onDragStateChange={setTableColumnIsDragging}
+                      tableColumnDragging={tableColumnDragging}
+                      onDragStateChange={setTableColumnDragging}
                     />
                   ))}
                 </TableRow>
