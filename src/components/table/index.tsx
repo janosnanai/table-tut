@@ -63,6 +63,7 @@ const columns = [
   columnHelper.display({
     id: "select",
     meta: { name: "Select", draggable: false },
+    size: 50,
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -85,6 +86,7 @@ const columns = [
   columnHelper.display({
     id: "index",
     meta: { name: "Index", draggable: false },
+    size: 50,
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -98,6 +100,7 @@ const columns = [
   columnHelper.accessor("fullName", {
     id: "fullName",
     meta: { name: "User", draggable: false },
+    minSize: 150,
     enableHiding: false,
     enableResizing: true,
     enableSorting: true,
@@ -465,9 +468,14 @@ function UsersTable() {
             placeholder="type searchterm..."
           />
         </Paper>
-        <p>{JSON.stringify(tableColumnDragging)}</p>
-        <p>{JSON.stringify(columnOrder)}</p>
-        <TableContainer component={Paper} elevation={3}>
+        <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
+        <div>cols order:{JSON.stringify(columnOrder)}</div>
+        <div>size:{JSON.stringify(table.getTotalSize())}</div>
+        <TableContainer
+          component={Paper}
+          elevation={3}
+          style={{ width: table.getTotalSize() }}
+        >
           <MUITable size="small" stickyHeader>
             <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
