@@ -297,7 +297,12 @@ function ColumnHeader({
       draggable={draggable}
       onDrag={handleDragStart}
       ref={dragRef}
-      sx={{ position: "relative" }}
+      sx={{
+        position: "relative",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      }}
       style={{ width: header.getSize() }}
     >
       <div style={{ fontSize: "9px" }}>
