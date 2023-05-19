@@ -332,6 +332,7 @@ function ColumnHeader({
               borderRightWidth: "4px",
               cursor: "col-resize",
               marginX: 1,
+              userSelect: "none",
             }}
           />
         )}
