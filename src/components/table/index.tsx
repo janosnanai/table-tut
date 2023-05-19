@@ -203,6 +203,7 @@ const defaultData = [] as User[];
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
   table: Table<T>;
+  // draggable: boolean;
   tableColumnDragging: string | null;
   onDragStateChange: (update: string | null) => void;
 }
@@ -210,6 +211,7 @@ interface ColumnHeaderProps<T> {
 function ColumnHeader({
   header,
   table,
+  // draggable,
   tableColumnDragging,
   onDragStateChange,
 }: ColumnHeaderProps<User>) {
@@ -218,6 +220,7 @@ function ColumnHeader({
   const { column } = header;
 
   const [resizable, setResizable] = useState(false);
+  const [draggable, setDraggable] = useState(true);
 
   const [, dropRef] = useDrop({
     accept: "column",
@@ -259,22 +262,25 @@ function ColumnHeader({
     onDragStateChange(null);
   }
 
-  function handleMouseOver() {
+  // TODO: make this a state-machine
+  function handleMouseOverResizer() {
+    setDraggable(false);
     setResizable(true);
   }
 
-  function handleMouseLeave() {
+  function handleMouseLeaveResizer() {
+    setDraggable(true);
     setResizable(false);
   }
 
   return (
     <TableCell
+      draggable={draggable}
       onDrag={handleDragStart}
-      onMouseOver={handleMouseOver}
-      onMouseLeave={handleMouseLeave}
       ref={dragRef}
       sx={{ position: "relative" }}
     >
+      <div></div>
       <div ref={previewRef}>
         <Stack direction="row">
           {flexRender(column.columnDef.header, header.getContext())}
@@ -287,16 +293,17 @@ function ColumnHeader({
           )}
         </Stack>
         <Divider
+          onMouseOver={handleMouseOverResizer}
+          onMouseLeave={handleMouseLeaveResizer}
           component="div"
           orientation="vertical"
-          // absolute
           light={!resizable}
           sx={{
             position: "absolute",
             height: "60%",
             top: "20%",
             right: 0,
-            borderRightWidth: "3px",
+            borderRightWidth: "4px",
             cursor: "col-resize",
             marginX: 1,
           }}
