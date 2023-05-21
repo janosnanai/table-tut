@@ -2,7 +2,6 @@ import { ChangeEvent } from "react";
 import type {
   ColumnOrderState,
   ColumnResizeMode,
-  ColumnSizingTableState,
   PaginationState,
   RowSelectionState,
   SortingState,
@@ -29,7 +28,6 @@ import {
   Divider,
   Stack,
   Box,
-  Container,
   Button,
   Checkbox,
   FormControlLabel,
@@ -220,6 +218,7 @@ const columns = [
   columnHelper.display({
     id: "actions",
     meta: { name: "Actions", draggable: false },
+    minSize: 100,
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
@@ -412,6 +411,7 @@ function UsersTable() {
   const columnResizeMode: ColumnResizeMode = "onChange";
 
   const { startTimeout, stopTimeout } = useTimeout(() =>
+    // TODO: merge pagination and filters into one config object
     setGlobalFilter(globalFilterInput)
   );
 
@@ -479,99 +479,102 @@ function UsersTable() {
   }
 
   return (
-    <Paper sx={{ background: "#ddd" }}>
-      {/* <Container> */}
-      <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
-        <Stack>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={table.getIsAllColumnsVisible()}
-                indeterminate={
-                  table.getIsSomeColumnsVisible() &&
-                  !table.getIsAllColumnsVisible()
-                }
-                onChange={table.getToggleAllColumnsVisibilityHandler()}
-              />
-            }
-            label="column visibility"
+    <Paper component="div" sx={{ background: "#ddd" }}>
+      <Box sx={{ p: 3 }}>
+        <Paper sx={{ display: "inline-block", mb: 3, py: 1, px: 3 }}>
+          <Stack>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={table.getIsAllColumnsVisible()}
+                  indeterminate={
+                    table.getIsSomeColumnsVisible() &&
+                    !table.getIsAllColumnsVisible()
+                  }
+                  onChange={table.getToggleAllColumnsVisibilityHandler()}
+                />
+              }
+              label="column visibility"
+            />
+            <Divider orientation="horizontal" />
+            {table.getAllLeafColumns().map((col) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={col.getIsVisible()}
+                      disabled={!col.getCanHide()}
+                      onChange={col.getToggleVisibilityHandler()}
+                    />
+                  }
+                  label={col.columnDef.meta?.name || col.id}
+                  key={col.id}
+                />
+              );
+            })}
+          </Stack>
+          <TextField
+            onChange={handleFilterChange}
+            value={globalFilterInput}
+            placeholder="type searchterm..."
           />
-          <Divider orientation="horizontal" />
-          {table.getAllLeafColumns().map((col) => {
-            return (
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={col.getIsVisible()}
-                    disabled={!col.getCanHide()}
-                    onChange={col.getToggleVisibilityHandler()}
-                  />
-                }
-                label={col.columnDef.meta?.name || col.id}
-                key={col.id}
-              />
-            );
-          })}
-        </Stack>
-        <TextField
-          onChange={handleFilterChange}
-          value={globalFilterInput}
-          placeholder="type searchterm..."
-        />
-      </Paper>
-      {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
+        </Paper>
+        {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
         <div>cols order:{JSON.stringify(columnOrder)}</div>
         <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
-      <TableContainer
-        component={Paper}
-        elevation={3}
-        style={{ width: table.getTotalSize() }}
-      >
-        <MUITable size="small" stickyHeader>
-          <TableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <ColumnHeader
-                    key={header.id}
-                    header={header}
-                    table={table}
-                    tableColumnDragging={tableColumnDragging}
-                    onDragStateChange={setTableColumnDragging}
-                  />
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    style={{ width: cell.column.getSize() }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </MUITable>
-        {/*TODO: make this shit error-free (warning on from-to label if no server data received yet...)*/}
-        <TablePagination
-          rowsPerPageOptions={PAGE_LIMITS}
-          component="div"
-          count={usersData?.pagination.count || 0}
-          rowsPerPage={pagination.pageSize}
-          page={pagination.pageIndex}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          showFirstButton
-          showLastButton
-        />
-      </TableContainer>
-      {/* </Container> */}
+        <TableContainer
+          component={Paper}
+          elevation={3}
+          style={{ width: table.getTotalSize() }}
+        >
+          <MUITable size="small" stickyHeader>
+            <TableHead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <ColumnHeader
+                      key={header.id}
+                      header={header}
+                      table={table}
+                      tableColumnDragging={tableColumnDragging}
+                      onDragStateChange={setTableColumnDragging}
+                    />
+                  ))}
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: cell.column.getSize() }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </MUITable>
+          {/*TODO: make this shit error-free (warning on from-to label if no server data received yet...)*/}
+          <TablePagination
+            rowsPerPageOptions={PAGE_LIMITS}
+            component="div"
+            count={usersData?.pagination.count || 0}
+            rowsPerPage={pagination.pageSize}
+            page={pagination.pageIndex}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            showFirstButton
+            showLastButton
+          />
+        </TableContainer>
+      </Box>
     </Paper>
   );
 }
