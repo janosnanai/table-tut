@@ -312,11 +312,11 @@ function ColumnHeader({
       }}
       style={{ maxWidth: header.getSize() }}
     >
-      <div style={{ fontSize: "9px" }}>
+      {/* <div style={{ fontSize: "9px" }}>
         <div>draggable: {JSON.stringify(draggable)}</div>
         <div>resizable: {JSON.stringify(resizable)}</div>
         <div>size: {header.column.getSize()}</div>
-      </div>
+      </div> */}
       <div ref={previewRef}>
         <Stack direction="row">
           {flexRender(column.columnDef.header, header.getContext())}
@@ -481,9 +481,9 @@ function UsersTable() {
             placeholder="type searchterm..."
           />
         </Paper>
-        <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
+        {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
         <div>cols order:{JSON.stringify(columnOrder)}</div>
-        <div>size:{JSON.stringify(table.getTotalSize())}</div>
+        <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
         <TableContainer
           component={Paper}
           elevation={3}
