@@ -99,7 +99,7 @@ const columns = [
   }),
   columnHelper.accessor("fullName", {
     id: "fullName",
-    meta: { name: "User", draggable: false },
+    meta: { name: "User", draggable: true },
     minSize: 150,
     enableHiding: false,
     enableResizing: true,
@@ -254,9 +254,10 @@ function ColumnHeader({
       );
       setColumnOrder(newColumnOrder);
     },
+    canDrop: () => header.column.columnDef.meta?.draggable || false,
   });
 
-  const [{ isDragging }, dragRef, previewRef] = useDrag({
+  const [_, dragRef, previewRef] = useDrag({
     collect: (monitor) => ({
       isDragging: header.column.columnDef.meta?.draggable
         ? monitor.isDragging()
