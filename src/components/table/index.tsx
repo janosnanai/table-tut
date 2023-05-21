@@ -105,7 +105,9 @@ const columns = [
     enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
-    header: "User",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>User</TruncatedHeader>
+    ),
     cell: (props) => (
       <Stack>
         <Box>
@@ -140,7 +142,11 @@ const columns = [
     enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
-    header: "E-mail",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>
+        E-mail
+      </TruncatedHeader>
+    ),
     cell: (props) => (
       <Typography
         variant="body2"
@@ -161,7 +167,9 @@ const columns = [
     enableHiding: true,
     enableResizing: true,
     enableSorting: true,
-    header: "Group",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>Group</TruncatedHeader>
+    ),
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -178,7 +186,12 @@ const columns = [
     enableResizing: true,
     enableSorting: true,
     enableGlobalFilter: true,
-    header: "Organization",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>
+        Organization
+      </TruncatedHeader>
+    ),
+
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -195,7 +208,11 @@ const columns = [
     enableResizing: true,
     enableSorting: false,
     enableGlobalFilter: false,
-    header: "Remark",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>
+        Remark
+      </TruncatedHeader>
+    ),
     cell: (props) => (
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
@@ -221,6 +238,27 @@ const initialPagination = {
 };
 
 const defaultData = [] as User[];
+
+interface TruncatedHeaderProps {
+  maxWidth: number;
+  children: React.ReactNode;
+}
+
+function TruncatedHeader({ maxWidth, children }: TruncatedHeaderProps) {
+  return (
+    <Typography
+      variant="body1"
+      sx={{
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+        maxWidth,
+      }}
+    >
+      {children}
+    </Typography>
+  );
+}
 
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
@@ -441,102 +479,100 @@ function UsersTable() {
   }
 
   return (
-    <Box sx={{ background: "#ddd" }}>
-      <Container>
-        <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
-          <Stack>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={table.getIsAllColumnsVisible()}
-                  indeterminate={
-                    table.getIsSomeColumnsVisible() &&
-                    !table.getIsAllColumnsVisible()
-                  }
-                  onChange={table.getToggleAllColumnsVisibilityHandler()}
-                />
-              }
-              label="column visibility"
-            />
-            <Divider orientation="horizontal" />
-            {table.getAllLeafColumns().map((col) => {
-              return (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={col.getIsVisible()}
-                      disabled={!col.getCanHide()}
-                      onChange={col.getToggleVisibilityHandler()}
-                    />
-                  }
-                  label={col.columnDef.meta?.name || col.id}
-                  key={col.id}
-                />
-              );
-            })}
-          </Stack>
-          <TextField
-            onChange={handleFilterChange}
-            value={globalFilterInput}
-            placeholder="type searchterm..."
+    <Paper sx={{ background: "#ddd" }}>
+      {/* <Container> */}
+      <Paper sx={{ display: "inline-block", m: 3, py: 1, px: 3 }}>
+        <Stack>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={table.getIsAllColumnsVisible()}
+                indeterminate={
+                  table.getIsSomeColumnsVisible() &&
+                  !table.getIsAllColumnsVisible()
+                }
+                onChange={table.getToggleAllColumnsVisibilityHandler()}
+              />
+            }
+            label="column visibility"
           />
-        </Paper>
-        {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
+          <Divider orientation="horizontal" />
+          {table.getAllLeafColumns().map((col) => {
+            return (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={col.getIsVisible()}
+                    disabled={!col.getCanHide()}
+                    onChange={col.getToggleVisibilityHandler()}
+                  />
+                }
+                label={col.columnDef.meta?.name || col.id}
+                key={col.id}
+              />
+            );
+          })}
+        </Stack>
+        <TextField
+          onChange={handleFilterChange}
+          value={globalFilterInput}
+          placeholder="type searchterm..."
+        />
+      </Paper>
+      {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
         <div>cols order:{JSON.stringify(columnOrder)}</div>
         <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
-        <TableContainer
-          component={Paper}
-          elevation={3}
-          style={{ width: table.getTotalSize() }}
-        >
-          <MUITable size="small" stickyHeader>
-            <TableHead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <ColumnHeader
-                      key={header.id}
-                      header={header}
-                      table={table}
-                      tableColumnDragging={tableColumnDragging}
-                      onDragStateChange={setTableColumnDragging}
-                    />
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{ width: cell.column.getSize() }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </MUITable>
-          <TablePagination
-            rowsPerPageOptions={PAGE_LIMITS}
-            component="div"
-            count={usersData?.pagination.count || 0}
-            rowsPerPage={pagination.pageSize}
-            page={pagination.pageIndex}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            showFirstButton
-            showLastButton
-          />
-        </TableContainer>
-      </Container>
-    </Box>
+      <TableContainer
+        component={Paper}
+        elevation={3}
+        style={{ width: table.getTotalSize() }}
+      >
+        <MUITable size="small" stickyHeader>
+          <TableHead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <ColumnHeader
+                    key={header.id}
+                    header={header}
+                    table={table}
+                    tableColumnDragging={tableColumnDragging}
+                    onDragStateChange={setTableColumnDragging}
+                  />
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    style={{ width: cell.column.getSize() }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </MUITable>
+        {/*TODO: make this shit error-free (warning on from-to label if no server data received yet...)*/}
+        <TablePagination
+          rowsPerPageOptions={PAGE_LIMITS}
+          component="div"
+          count={usersData?.pagination.count || 0}
+          rowsPerPage={pagination.pageSize}
+          page={pagination.pageIndex}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          showFirstButton
+          showLastButton
+        />
+      </TableContainer>
+      {/* </Container> */}
+    </Paper>
   );
 }
 
