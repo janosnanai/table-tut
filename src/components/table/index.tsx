@@ -610,11 +610,10 @@ function UsersTable() {
               ))}
             </TableBody>
           </MUITable>
-          {/*TODO: make this shit error-free (warning on from-to label if no server data received yet...)*/}
           <TablePagination
             rowsPerPageOptions={PAGE_LIMITS}
             component="div"
-            count={usersData?.pagination.count || 0}
+            count={usersData?.pagination.count || -1}
             rowsPerPage={pagination.pageSize}
             page={pagination.pageIndex}
             onPageChange={handlePageChange}
