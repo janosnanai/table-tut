@@ -62,7 +62,13 @@ export const handlers = [
       },
     });
 
-    const count = db.user.count();
+    const count = db.user.count({
+      where: {
+        fullName: {
+          contains: searchTerm || "",
+        },
+      },
+    });
 
     return res(
       ctx.status(200),
