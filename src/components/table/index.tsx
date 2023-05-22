@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import type {
   ColumnOrderState,
   ColumnResizeMode,
@@ -14,6 +14,15 @@ import type { User } from "../../mocks/db";
 
 import { useState } from "react";
 import {
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  Divider,
+  FormControlLabel,
+  Paper,
+  Popover,
+  Stack,
   Table as MUITable,
   TableBody,
   TableCell,
@@ -22,16 +31,8 @@ import {
   TableRow,
   TablePagination,
   TableSortLabel,
-  Typography,
-  Paper,
-  Chip,
-  Divider,
-  Stack,
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
   TextField,
+  Typography,
 } from "@mui/material";
 import {
   createColumnHelper,
@@ -393,6 +394,73 @@ function ColumnHeader({
   );
 }
 
+interface VisibilityMenuProps<T> {
+  table: Table<T>;
+}
+
+function VisibilityMenu({ table }: VisibilityMenuProps<User>) {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+    setAnchorEl(e.currentTarget);
+  }
+
+  function handleClose() {
+    setAnchorEl(null);
+  }
+
+  const isOpen = !!anchorEl;
+
+  return (
+    <>
+      <Button onClick={handleClick} variant="contained">
+        columns
+      </Button>
+      <Popover
+        open={isOpen}
+        onClose={handleClose}
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Box sx={{ py: 1, px: 3 }}>
+          <Stack>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={table.getIsAllColumnsVisible()}
+                  indeterminate={
+                    table.getIsSomeColumnsVisible() &&
+                    !table.getIsAllColumnsVisible()
+                  }
+                  onChange={table.getToggleAllColumnsVisibilityHandler()}
+                />
+              }
+              label="column visibility"
+            />
+            <Divider orientation="horizontal" />
+            {table.getAllLeafColumns().map((col) => {
+              return (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={col.getIsVisible()}
+                      disabled={!col.getCanHide()}
+                      onChange={col.getToggleVisibilityHandler()}
+                    />
+                  }
+                  label={col.columnDef.meta?.name || col.id}
+                  key={col.id}
+                />
+              );
+            })}
+          </Stack>
+        </Box>
+      </Popover>
+    </>
+  );
+}
+
 function UsersTable() {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     getDefaultColumnOrder()
@@ -481,47 +549,28 @@ function UsersTable() {
   return (
     <Paper component="div" sx={{ background: "#ddd" }}>
       <Box sx={{ p: 3 }}>
-        <Paper sx={{ display: "inline-block", mb: 3, py: 1, px: 3 }}>
-          <Stack>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={table.getIsAllColumnsVisible()}
-                  indeterminate={
-                    table.getIsSomeColumnsVisible() &&
-                    !table.getIsAllColumnsVisible()
-                  }
-                  onChange={table.getToggleAllColumnsVisibilityHandler()}
-                />
-              }
-              label="column visibility"
-            />
-            <Divider orientation="horizontal" />
-            {table.getAllLeafColumns().map((col) => {
-              return (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={col.getIsVisible()}
-                      disabled={!col.getCanHide()}
-                      onChange={col.getToggleVisibilityHandler()}
-                    />
-                  }
-                  label={col.columnDef.meta?.name || col.id}
-                  key={col.id}
-                />
-              );
-            })}
-          </Stack>
+        <Paper
+          sx={{
+            display: "inline-flex",
+            gap: 3,
+            p: 3,
+            mb: 3,
+            alignItems: "center",
+          }}
+        >
           <TextField
             onChange={handleFilterChange}
             value={globalFilterInput}
             placeholder="type searchterm..."
           />
+          <VisibilityMenu table={table} />
+          <Button variant="contained" onClick={resetColumnOrder}>
+            reset order
+          </Button>
         </Paper>
         {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
         <div>cols order:{JSON.stringify(columnOrder)}</div>
-        <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
+      <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
         <TableContainer
           component={Paper}
           elevation={3}
