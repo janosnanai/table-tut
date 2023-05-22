@@ -1,3 +1,4 @@
+// TODO: asc/desc toggle into 2 buttons, advanced search menu, a11y and i18n
 import type { ChangeEvent } from "react";
 import type {
   ColumnOrderState,
