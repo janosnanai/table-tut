@@ -1,4 +1,5 @@
 import type { UsersPage } from "../mocks/handlers";
+import type { ColumnSort } from "@tanstack/react-table";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -9,10 +10,7 @@ interface Options {
     pageIndex: number;
     pageSize: number;
   };
-  sorting: {
-    id: string;
-    desc: boolean;
-  };
+  sorting: ColumnSort[];
   filter: {
     global: string;
   };
@@ -28,11 +26,11 @@ async function queryFn(options: Options) {
             "&page=" +
             options.pagination.pageIndex.toString()
           : "") +
-        (options.sorting
+        (options.sorting.length > 0
           ? "&orderby=" +
-            options.sorting.id +
+            options.sorting[0].id +
             "&desc=" +
-            options.sorting.desc.toString()
+            options.sorting[0].desc.toString()
           : "") +
         (options.filter ? "&st=" + options.filter.global : "")
       : ""

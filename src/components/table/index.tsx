@@ -10,10 +10,13 @@ import type {
   Header,
   Column,
   Table,
+  ColumnFiltersState,
+  ColumnSort,
+  Updater,
 } from "@tanstack/react-table";
 import type { User } from "../../mocks/db";
 
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import {
   Box,
   Button,
@@ -38,6 +41,7 @@ import {
 import {
   createColumnHelper,
   flexRender,
+  functionalUpdate,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -232,13 +236,6 @@ const columns = [
     ),
   }),
 ];
-
-const initialPagination = {
-  pageIndex: 0,
-  pageSize: PAGE_LIMITS[0],
-};
-
-const defaultData = [] as User[];
 
 interface TruncatedHeaderProps {
   maxWidth: number;
@@ -462,33 +459,129 @@ function VisibilityMenu({ table }: VisibilityMenuProps<User>) {
   );
 }
 
+const initialPagination = {
+  pageIndex: 0,
+  pageSize: PAGE_LIMITS[0],
+} as PaginationState;
+
+const defaultData = [] as User[];
+
+interface DataOptionsState {
+  pagination: PaginationState;
+  sorting: [];
+  filter: { global: string };
+}
+
+const initialDataOptions = {
+  pagination: initialPagination,
+  sorting: [],
+  filter: { global: "" },
+} as DataOptionsState;
+
+const enum DataOptionsActionType {
+  SET_GLOBAL_FILTER = "SET_GLOBAL_FILTER",
+  SET_GLOBAL_FILTER_SAFE_PAGINATION = "SET_GLOBAL_FILTER_SAFE_PAGINATION",
+  SET_PAGINATION = "SET_PAGINATION",
+  SET_SORTING = "SET_SORTING",
+}
+
+interface dataOptionsAction {
+  type: DataOptionsActionType;
+  payload: any;
+}
+
+function dataOptionsReducer(
+  state: DataOptionsState,
+  action: dataOptionsAction
+): DataOptionsState {
+  switch (action.type) {
+    case DataOptionsActionType.SET_GLOBAL_FILTER: {
+      return {
+        ...state,
+        filter: { ...state.filter, global: action.payload },
+        pagination: { ...state.pagination, pageIndex: 1 },
+      };
+    }
+    case DataOptionsActionType.SET_PAGINATION: {
+      console.log(action.payload);
+
+      return {
+        ...state,
+        pagination: { ...action.payload },
+      };
+    }
+    case DataOptionsActionType.SET_SORTING: {
+      console.log(action.payload);
+      
+      return { ...state, sorting: action.payload };
+    }
+    default:
+      throw Error("Unknown action: " + action.type);
+  }
+}
+
 function UsersTable() {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     getDefaultColumnOrder()
   );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [globalFilter, setGlobalFilter] = useState("");
+  // const [globalFilter, setGlobalFilter] = useState("");
   const [globalFilterInput, setGlobalFilterInput] = useState("");
-  const [pagination, setPagination] =
-    useState<PaginationState>(initialPagination);
+  // const [pagination, setPagination] =
+  //   useState<PaginationState>(initialPagination);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([]);
+  // const [sorting, setSorting] = useState<SortingState>([]);
   const [tableColumnDragging, setTableColumnDragging] = useState<string | null>(
     null
   );
 
-  const columnResizeMode: ColumnResizeMode = "onChange";
-
-  const { startTimeout, stopTimeout } = useTimeout(() =>
-    // TODO: merge pagination and filters into one config object
-    setGlobalFilter(globalFilterInput)
+  const [dataOptions, dispatch] = useReducer(
+    dataOptionsReducer,
+    initialDataOptions
   );
 
-  const { data: usersData } = useGetUsersQuery({
-    pagination,
-    sorting: sorting[0],
-    filter: { global: globalFilter },
+  function setGlobalFilter(update: string) {
+    dispatch({
+      type: DataOptionsActionType.SET_GLOBAL_FILTER,
+      payload: update,
+    });
+  }
+
+  // function setPagination(update: PaginationState) {
+  //   dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
+  // }
+  function setPagination(updaterFn: Updater<PaginationState>) {
+    const old = dataOptions.pagination;
+    const update = functionalUpdate(updaterFn, old);
+    dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
+  }
+
+  // function setSorting(update: SortingState) {
+  //   dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
+  // }
+  function setSorting(updaterFn: Updater<SortingState>) {
+    const old = dataOptions.sorting;
+    const update = functionalUpdate(updaterFn, old);
+    dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
+  }
+
+  const columnResizeMode: ColumnResizeMode = "onChange";
+
+  const { startTimeout, stopTimeout } = useTimeout(() => {
+    // TODO: merge pagination and filters into one config object
+    // setGlobalFilter(globalFilterInput);
+    // setDataOptions({
+    //   pagination,
+    //   sorting: sorting[0],
+    //   filter: { global: globalFilter },
+    // });
+    dispatch({
+      type: DataOptionsActionType.SET_GLOBAL_FILTER_SAFE_PAGINATION,
+      payload: globalFilterInput,
+    });
   });
+
+  const { data: usersData } = useGetUsersQuery(dataOptions);
 
   const table = useReactTable({
     data: usersData?.data || defaultData,
@@ -498,10 +591,10 @@ function UsersTable() {
     state: {
       columnOrder,
       columnVisibility,
-      globalFilter,
-      pagination,
+      globalFilter: dataOptions.filter.global,
+      pagination: dataOptions.pagination,
       rowSelection,
-      sorting,
+      sorting: dataOptions.sorting,
     },
     onColumnOrderChange: setColumnOrder,
     onColumnVisibilityChange: setColumnVisibility,
@@ -615,8 +708,8 @@ function UsersTable() {
             rowsPerPageOptions={PAGE_LIMITS}
             component="div"
             count={usersData?.pagination.count || -1}
-            rowsPerPage={pagination.pageSize}
-            page={pagination.pageIndex}
+            rowsPerPage={dataOptions.pagination.pageSize}
+            page={dataOptions.pagination.pageIndex}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             showFirstButton
