@@ -499,7 +499,13 @@ function dataOptionsReducer(
       return {
         ...state,
         filter: { ...state.filter, global: action.payload },
-        pagination: { ...state.pagination, pageIndex: 1 },
+      };
+    }
+    case DataOptionsActionType.SET_GLOBAL_FILTER_SAFE_PAGINATION: {
+      return {
+        ...state,
+        filter: { ...state.filter, global: action.payload },
+        pagination: { ...state.pagination, pageIndex: 0 },
       };
     }
     case DataOptionsActionType.SET_PAGINATION: {
@@ -512,7 +518,7 @@ function dataOptionsReducer(
     }
     case DataOptionsActionType.SET_SORTING: {
       console.log(action.payload);
-      
+
       return { ...state, sorting: action.payload };
     }
     default:
@@ -551,8 +557,8 @@ function UsersTable() {
   //   dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
   // }
   function setPagination(updaterFn: Updater<PaginationState>) {
-    const old = dataOptions.pagination;
-    const update = functionalUpdate(updaterFn, old);
+    const prev = { ...dataOptions.pagination };
+    const update = functionalUpdate(updaterFn, prev);
     dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
   }
 
@@ -560,8 +566,8 @@ function UsersTable() {
   //   dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
   // }
   function setSorting(updaterFn: Updater<SortingState>) {
-    const old = dataOptions.sorting;
-    const update = functionalUpdate(updaterFn, old);
+    const prev = [...dataOptions.sorting];
+    const update = functionalUpdate(updaterFn, prev);
     dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
   }
 
@@ -642,6 +648,7 @@ function UsersTable() {
 
   return (
     <Paper component="div" sx={{ background: "#ddd" }}>
+      <p>{JSON.stringify(table.getState())}</p>
       <Box sx={{ p: 3 }}>
         <Paper
           sx={{
