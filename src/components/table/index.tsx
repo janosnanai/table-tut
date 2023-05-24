@@ -10,8 +10,6 @@ import type {
   Header,
   Column,
   Table,
-  ColumnFiltersState,
-  ColumnSort,
   Updater,
 } from "@tanstack/react-table";
 import type { User } from "../../mocks/db";
@@ -348,11 +346,6 @@ function ColumnHeader({
       }}
       style={{ maxWidth: header.getSize() }}
     >
-      {/* <div style={{ fontSize: "9px" }}>
-        <div>draggable: {JSON.stringify(draggable)}</div>
-        <div>resizable: {JSON.stringify(resizable)}</div>
-        <div>size: {header.column.getSize()}</div>
-      </div> */}
       <div ref={previewRef}>
         <Stack direction="row">
           {flexRender(column.columnDef.header, header.getContext())}
@@ -509,16 +502,12 @@ function dataOptionsReducer(
       };
     }
     case DataOptionsActionType.SET_PAGINATION: {
-      console.log(action.payload);
-
       return {
         ...state,
         pagination: { ...action.payload },
       };
     }
     case DataOptionsActionType.SET_SORTING: {
-      console.log(action.payload);
-
       return { ...state, sorting: action.payload };
     }
     default:
@@ -531,57 +520,46 @@ function UsersTable() {
     getDefaultColumnOrder()
   );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  // const [globalFilter, setGlobalFilter] = useState("");
   const [globalFilterInput, setGlobalFilterInput] = useState("");
-  // const [pagination, setPagination] =
-  //   useState<PaginationState>(initialPagination);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  // const [sorting, setSorting] = useState<SortingState>([]);
   const [tableColumnDragging, setTableColumnDragging] = useState<string | null>(
     null
   );
 
-  const [dataOptions, dispatch] = useReducer(
+  const [dataOptions, dispatchDataOptionsAction] = useReducer(
     dataOptionsReducer,
     initialDataOptions
   );
 
   function setGlobalFilter(update: string) {
-    dispatch({
+    dispatchDataOptionsAction({
       type: DataOptionsActionType.SET_GLOBAL_FILTER,
       payload: update,
     });
   }
 
-  // function setPagination(update: PaginationState) {
-  //   dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
-  // }
   function setPagination(updaterFn: Updater<PaginationState>) {
     const prev = { ...dataOptions.pagination };
     const update = functionalUpdate(updaterFn, prev);
-    dispatch({ type: DataOptionsActionType.SET_PAGINATION, payload: update });
+    dispatchDataOptionsAction({
+      type: DataOptionsActionType.SET_PAGINATION,
+      payload: update,
+    });
   }
 
-  // function setSorting(update: SortingState) {
-  //   dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
-  // }
   function setSorting(updaterFn: Updater<SortingState>) {
     const prev = [...dataOptions.sorting];
     const update = functionalUpdate(updaterFn, prev);
-    dispatch({ type: DataOptionsActionType.SET_SORTING, payload: update });
+    dispatchDataOptionsAction({
+      type: DataOptionsActionType.SET_SORTING,
+      payload: update,
+    });
   }
 
   const columnResizeMode: ColumnResizeMode = "onChange";
 
   const { startTimeout, stopTimeout } = useTimeout(() => {
-    // TODO: merge pagination and filters into one config object
-    // setGlobalFilter(globalFilterInput);
-    // setDataOptions({
-    //   pagination,
-    //   sorting: sorting[0],
-    //   filter: { global: globalFilter },
-    // });
-    dispatch({
+    dispatchDataOptionsAction({
       type: DataOptionsActionType.SET_GLOBAL_FILTER_SAFE_PAGINATION,
       payload: globalFilterInput,
     });
@@ -648,7 +626,6 @@ function UsersTable() {
 
   return (
     <Paper component="div" sx={{ background: "#ddd" }}>
-      <p>{JSON.stringify(table.getState())}</p>
       <Box sx={{ p: 3 }}>
         <Paper
           sx={{
@@ -669,9 +646,6 @@ function UsersTable() {
             reset order
           </Button>
         </Paper>
-        {/* <div>dragging: {JSON.stringify(tableColumnDragging)}</div>
-        <div>cols order:{JSON.stringify(columnOrder)}</div>
-      <div>size:{JSON.stringify(table.getTotalSize())}</div> */}
         <TableContainer
           component={Paper}
           elevation={3}
