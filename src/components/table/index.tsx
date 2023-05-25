@@ -46,8 +46,8 @@ import {
 
 import selectColDef from "./column-def/select-col";
 import indexColDef from "./column-def/index-col";
-import TruncatedHeader from "./header/truncated-header";
-import ColumnHeader from "./header";
+import TruncatedHeader from "./column-def/header/truncated-header";
+import ColumnHeader from "./column-header";
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
 import { PAGE_LIMITS } from "../../config";
@@ -190,7 +190,11 @@ const columns = [
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
-    header: "Actions",
+    header: (props) => (
+      <TruncatedHeader maxWidth={props.column.getSize()}>
+        Actions
+      </TruncatedHeader>
+    ),
     cell: (props) => (
       <Button onClick={() => console.log(JSON.stringify(props.row))}>
         hello

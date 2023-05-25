@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { flexRender } from "@tanstack/react-table";
 
-import { SORT_DIRECTION } from "../../../config";
+import { SORT_DIRECTION } from "../../config";
 
 interface ColumnHeaderProps<T> {
   header: Header<T, unknown>;
