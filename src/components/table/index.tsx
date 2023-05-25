@@ -48,9 +48,11 @@ import {
 } from "@tanstack/react-table";
 import { useDrag, useDrop } from "react-dnd";
 
+import selectColDef from "./column-def/select-col";
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
 import { PAGE_LIMITS, SORT_DIRECTION } from "../../config";
+import indexColDef from "./column-def/index-col";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends unknown, TValue> {
@@ -62,43 +64,45 @@ declare module "@tanstack/react-table" {
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
-  columnHelper.display({
-    id: "select",
-    meta: { name: "Select", draggable: false },
-    size: 50,
-    enableHiding: false,
-    enableResizing: false,
-    enableSorting: false,
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={table.getIsSomePageRowsSelected()}
-        onChange={table.getToggleAllRowsSelectedHandler()}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        disabled={!row.getCanSelect()}
-        indeterminate={row.getIsSomeSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
-  columnHelper.display({
-    id: "index",
-    meta: { name: "Index", draggable: false },
-    size: 50,
-    enableHiding: false,
-    enableResizing: false,
-    enableSorting: false,
-    header: "#",
-    cell: ({ row, table }) =>
-      row.index +
-      1 +
-      table.getState().pagination.pageIndex *
-        table.getState().pagination.pageSize,
-  }),
+  // columnHelper.display({
+  //   id: "select",
+  //   meta: { name: "Select", draggable: false },
+  //   size: 50,
+  //   enableHiding: false,
+  //   enableResizing: false,
+  //   enableSorting: false,
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={table.getIsAllPageRowsSelected()}
+  //       indeterminate={table.getIsSomePageRowsSelected()}
+  //       onChange={table.getToggleAllPageRowsSelectedHandler()}
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       disabled={!row.getCanSelect()}
+  //       indeterminate={row.getIsSomeSelected()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
+  selectColDef<User>({ columnHelper }),
+  // columnHelper.display({
+  //   id: "index",
+  //   meta: { name: "Index", draggable: false },
+  //   size: 50,
+  //   enableHiding: false,
+  //   enableResizing: false,
+  //   enableSorting: false,
+  //   header: "#",
+  //   cell: ({ row, table }) =>
+  //     row.index +
+  //     1 +
+  //     table.getState().pagination.pageIndex *
+  //       table.getState().pagination.pageSize,
+  // }),
+  indexColDef<User>({ columnHelper }),
   columnHelper.accessor("fullName", {
     id: "fullName",
     meta: { name: "User", draggable: true },
@@ -193,7 +197,6 @@ const columns = [
         Organization
       </TruncatedHeader>
     ),
-
     cell: (props) => (
       <Stack>
         <Typography variant="body1">{props.getValue()}</Typography>
@@ -646,6 +649,7 @@ function UsersTable() {
             reset order
           </Button>
         </Paper>
+        <p>{JSON.stringify(table.getState().rowSelection)}</p>
         <TableContainer
           component={Paper}
           elevation={3}
