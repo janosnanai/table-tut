@@ -2,7 +2,7 @@ import type { CellContext, HeaderContext } from "@tanstack/react-table";
 
 import { Checkbox } from "@mui/material";
 
-function selectColDef<T>() {
+function createSelectColDef<T>() {
   return {
     id: "select",
     meta: { name: "Select", draggable: false },
@@ -28,4 +28,4 @@ function selectColDef<T>() {
   };
 }
 
-export default selectColDef;
+export default createSelectColDef;

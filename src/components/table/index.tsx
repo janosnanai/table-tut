@@ -44,8 +44,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import selectColDef from "./column-def/select-col";
-import indexColDef from "./column-def/index-col";
+import createSelectColDef from "./column-def/select-col";
+import createIndexColDef from "./column-def/index-col";
 import createActionColDef from "./column-def/action-col";
 import TruncatedHeader from "./column-def/header/truncated-header";
 import ColumnHeader from "./column-header";
@@ -63,8 +63,8 @@ declare module "@tanstack/react-table" {
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
-  selectColDef<User>(),
-  indexColDef<User>(),
+  createSelectColDef<User>(),
+  createIndexColDef<User>(),
   columnHelper.accessor("fullName", {
     id: "fullName",
     meta: { name: "User", draggable: true },
