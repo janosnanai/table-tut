@@ -7,6 +7,7 @@ import createActionColDef from "../../components/table/column-def/action-col";
 import createSelectColDef from "../../components/table/column-def/select-col";
 import createIndexColDef from "../../components/table/column-def/index-col";
 
+// TODO make more abstract columns builder
 const userColumns = [
   createSelectColDef<User>(),
   createIndexColDef<User>(),
