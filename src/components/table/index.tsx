@@ -148,11 +148,11 @@ const columns = [
   }),
 ];
 
-interface VisibilityMenuProps<T> {
+interface ViewMenuProps<T> {
   table: Table<T>;
 }
 
-function VisibilityMenu({ table }: VisibilityMenuProps<User>) {
+function ViewMenu({ table }: ViewMenuProps<User>) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
@@ -278,7 +278,7 @@ function dataOptionsReducer(
   }
 }
 
-function UsersTable() {
+function MyTable() {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     getDefaultColumnOrder()
   );
@@ -404,7 +404,7 @@ function UsersTable() {
             value={globalFilterInput}
             placeholder="type searchterm..."
           />
-          <VisibilityMenu table={table} />
+          <ViewMenu table={table} />
           <Button variant="contained" onClick={resetColumnOrder}>
             reset order
           </Button>
@@ -465,4 +465,4 @@ function UsersTable() {
   );
 }
 
-export default UsersTable;
+export default MyTable;
