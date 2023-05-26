@@ -31,7 +31,7 @@ function ColumnHeader<T>({
 
   const [resizable, setResizable] = useState(false);
   const [draggable, setDraggable] = useState(
-    header.column.columnDef.meta?.draggable || false
+    column.columnDef.meta?.draggable || false
   );
 
   const [, dropRef] = useDrop({
@@ -44,16 +44,16 @@ function ColumnHeader<T>({
       );
       setColumnOrder(newColumnOrder);
     },
-    canDrop: () => header.column.columnDef.meta?.draggable || false,
+    canDrop: () => column.columnDef.meta?.draggable || false,
   });
 
   const [_, dragRef, previewRef] = useDrag({
     collect: (monitor) => ({
-      isDragging: header.column.columnDef.meta?.draggable
+      isDragging: column.columnDef.meta?.draggable
         ? monitor.isDragging()
         : null,
     }),
-    item: () => (header.column.columnDef.meta?.draggable ? column : null),
+    item: () => (column.columnDef.meta?.draggable ? column : null),
     type: "column",
     end: handleDragEnd,
   });
@@ -81,14 +81,14 @@ function ColumnHeader<T>({
   }
 
   function handleMouseOverResizer() {
-    if (!header.column.getCanResize()) return;
+    if (!column.getCanResize()) return;
     setDraggable(false);
     setResizable(true);
   }
 
   function handleMouseLeaveResizer() {
-    if (!header.column.getCanResize()) return;
-    setDraggable(header.column.columnDef.meta?.draggable || false);
+    if (!column.getCanResize()) return;
+    setDraggable(column.columnDef.meta?.draggable || false);
     setResizable(false);
   }
 

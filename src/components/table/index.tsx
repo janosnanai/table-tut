@@ -34,7 +34,6 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  createColumnHelper,
   flexRender,
   functionalUpdate,
   getCoreRowModel,
@@ -44,10 +43,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import createAccessorColDef from "./column-def/accessor-col";
 import createSelectColDef from "./column-def/select-col";
 import createIndexColDef from "./column-def/index-col";
 import createActionColDef from "./column-def/action-col";
-import TruncatedHeader from "./column-def/header/truncated-header";
 import ColumnHeader from "./column-header";
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
@@ -60,32 +59,22 @@ declare module "@tanstack/react-table" {
   }
 }
 
-const columnHelper = createColumnHelper<User>();
-
 const columns = [
   createSelectColDef<User>(),
   createIndexColDef<User>(),
-  columnHelper.accessor("fullName", {
-    id: "fullName",
-    meta: { name: "User", draggable: true },
-    minSize: 150,
-    enableHiding: false,
-    enableResizing: true,
-    enableSorting: true,
-    enableGlobalFilter: true,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>User</TruncatedHeader>
-    ),
-    cell: (props) => (
+  createAccessorColDef<User, string>({
+    accessorKey: "fullName",
+    header: "User",
+    cell: (ctx) => (
       <Stack>
         <Box>
           <Typography
             variant="body1"
             sx={{ display: "inline-block", fontWeight: 700 }}
           >
-            {props.getValue()}
+            {ctx.getValue()}
           </Typography>
-          {!props.row.original["active"] && (
+          {!ctx.row.original["active"] && (
             <Chip
               label="inactive"
               size="small"
@@ -94,95 +83,61 @@ const columns = [
             />
           )}
         </Box>
-        <Typography variant="body2">
-          {props.row.original["username"]}
-        </Typography>
+        <Typography variant="body2">{ctx.row.original["username"]}</Typography>
         <Typography variant="caption" color="#777">
-          {props.row.original["id"]}
+          {ctx.row.original["id"]}
         </Typography>
       </Stack>
     ),
+    enableHiding: false,
+    minSize: 150,
   }),
-  columnHelper.accessor("email", {
-    id: "email",
-    meta: { name: "E-mail", draggable: true },
-    enableHiding: true,
-    enableResizing: true,
-    enableSorting: true,
-    enableGlobalFilter: true,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>
-        E-mail
-      </TruncatedHeader>
-    ),
-    cell: (props) => (
+  createAccessorColDef<User, string>({
+    accessorKey: "email",
+    header: "E-mail",
+    cell: (ctx) => (
       <Typography
         variant="body2"
         sx={{
           textOverflow: "ellipsis",
           overflow: "hidden",
           whiteSpace: "nowrap",
-          maxWidth: props.column.getSize(),
+          maxWidth: ctx.column.getSize(),
         }}
       >
-        {props.getValue()}
+        {ctx.getValue()}
       </Typography>
     ),
   }),
-  columnHelper.accessor("group.name", {
-    id: "group.name",
-    meta: { name: "Group", draggable: true },
-    enableHiding: true,
-    enableResizing: true,
-    enableSorting: true,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>Group</TruncatedHeader>
-    ),
-    cell: (props) => (
+  createAccessorColDef<User, string>({
+    accessorKey: "group.name",
+    header: "Group",
+    cell: (ctx) => (
       <Stack>
-        <Typography variant="body1">{props.getValue()}</Typography>
+        <Typography variant="body1">{ctx.getValue()}</Typography>
         <Typography variant="caption" color="#777">
-          {props.row.original["group"]["id"]}
+          {ctx.row.original["group"]["id"]}
         </Typography>
       </Stack>
     ),
   }),
-  columnHelper.accessor("org.name", {
-    id: "org.name",
-    meta: { name: "Organization", draggable: true },
-    enableHiding: true,
-    enableResizing: true,
-    enableSorting: true,
-    enableGlobalFilter: true,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>
-        Organization
-      </TruncatedHeader>
-    ),
-    cell: (props) => (
+  createAccessorColDef<User, string>({
+    accessorKey: "org.name",
+    header: "Organization",
+    cell: (ctx) => (
       <Stack>
-        <Typography variant="body1">{props.getValue()}</Typography>
+        <Typography variant="body1">{ctx.getValue()}</Typography>
         <Typography variant="caption" color="#777">
-          {props.row.original["org"]["id"]}
+          {ctx.row.original["org"]["id"]}
         </Typography>
       </Stack>
     ),
   }),
-  columnHelper.accessor("remark", {
-    id: "remark",
-    meta: { name: "Remark", draggable: true },
-    enableHiding: true,
-    enableResizing: true,
+  createAccessorColDef<User, string>({
+    accessorKey: "remark",
+    header: "Remark",
+    cell: (ctx) => <Typography variant="body2">{ctx.getValue()}</Typography>,
     enableSorting: false,
-    enableGlobalFilter: false,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>
-        Remark
-      </TruncatedHeader>
-    ),
-    cell: (props) => (
-      <Typography variant="body2">{props.getValue()}</Typography>
-    ),
   }),
   createActionColDef<User>({
     cell: (ctx) => (
@@ -454,7 +409,6 @@ function UsersTable() {
             reset order
           </Button>
         </Paper>
-        <p>{JSON.stringify(table.getState().rowSelection)}</p>
         <TableContainer
           component={Paper}
           elevation={3}
