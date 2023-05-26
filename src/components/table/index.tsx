@@ -63,8 +63,8 @@ declare module "@tanstack/react-table" {
 const columnHelper = createColumnHelper<User>();
 
 const columns = [
-  selectColDef<User>({ columnHelper }),
-  indexColDef<User>({ columnHelper }),
+  selectColDef<User>(),
+  indexColDef<User>(),
   columnHelper.accessor("fullName", {
     id: "fullName",
     meta: { name: "User", draggable: true },
@@ -184,26 +184,7 @@ const columns = [
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
-  // columnHelper.display({
-  //   id: "actions",
-  //   meta: { name: "Actions", draggable: false },
-  //   minSize: 100,
-  //   enableHiding: false,
-  //   enableResizing: false,
-  //   enableSorting: false,
-  //   header: (props) => (
-  //     <TruncatedHeader maxWidth={props.column.getSize()}>
-  //       Actions
-  //     </TruncatedHeader>
-  //   ),
-  //   cell: (props) => (
-  //     <Button onClick={() => console.log(JSON.stringify(props.row))}>
-  //       hello
-  //     </Button>
-  //   ),
-  // }),
   createActionColDef<User>({
-    columnHelper,
     cell: (ctx) => (
       <Button onClick={() => console.log(JSON.stringify(ctx.row))}>
         hello

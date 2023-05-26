@@ -1,35 +1,31 @@
-import type { ColumnHelper } from "@tanstack/react-table";
+import type { CellContext, HeaderContext } from "@tanstack/react-table";
 
 import { Checkbox } from "@mui/material";
 
-interface SelectColProps<T> {
-  columnHelper: ColumnHelper<T>;
-}
-
-function selectColDef<T>({ columnHelper }: SelectColProps<T>) {
-  return columnHelper.display({
+function selectColDef<T>() {
+  return {
     id: "select",
     meta: { name: "Select", draggable: false },
     size: 50,
     enableHiding: false,
     enableResizing: false,
     enableSorting: false,
-    header: ({ table }) => (
+    header: (ctx: HeaderContext<T, unknown>) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={table.getIsSomePageRowsSelected()}
-        onChange={table.getToggleAllPageRowsSelectedHandler()}
+        checked={ctx.table.getIsAllPageRowsSelected()}
+        indeterminate={ctx.table.getIsSomePageRowsSelected()}
+        onChange={ctx.table.getToggleAllPageRowsSelectedHandler()}
       />
     ),
-    cell: ({ row }) => (
+    cell: (ctx: CellContext<T, unknown>) => (
       <Checkbox
-        checked={row.getIsSelected()}
-        disabled={!row.getCanSelect()}
-        indeterminate={row.getIsSomeSelected()}
-        onChange={row.getToggleSelectedHandler()}
+        checked={ctx.row.getIsSelected()}
+        disabled={!ctx.row.getCanSelect()}
+        indeterminate={ctx.row.getIsSomeSelected()}
+        onChange={ctx.row.getToggleSelectedHandler()}
       />
     ),
-  });
+  };
 }
 
 export default selectColDef;

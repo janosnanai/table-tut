@@ -1,11 +1,7 @@
-import type { ColumnHelper } from "@tanstack/react-table";
+import type { CellContext } from "@tanstack/react-table";
 
-interface IndexColProps<T> {
-  columnHelper: ColumnHelper<T>;
-}
-
-function indexColDef<T>({ columnHelper }: IndexColProps<T>) {
-  return columnHelper.display({
+function indexColDef<T>() {
+  return {
     id: "index",
     meta: { name: "Index", draggable: false },
     size: 50,
@@ -13,12 +9,12 @@ function indexColDef<T>({ columnHelper }: IndexColProps<T>) {
     enableResizing: false,
     enableSorting: false,
     header: "#",
-    cell: ({ row, table }) =>
-      row.index +
+    cell: (ctx: CellContext<T, unknown>) =>
+      ctx.row.index +
       1 +
-      table.getState().pagination.pageIndex *
-        table.getState().pagination.pageSize,
-  });
+      ctx.table.getState().pagination.pageIndex *
+        ctx.table.getState().pagination.pageSize,
+  };
 }
 
 export default indexColDef;
