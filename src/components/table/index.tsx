@@ -46,6 +46,7 @@ import {
 
 import selectColDef from "./column-def/select-col";
 import indexColDef from "./column-def/index-col";
+import createActionColDef from "./column-def/action-col";
 import TruncatedHeader from "./column-def/header/truncated-header";
 import ColumnHeader from "./column-header";
 import useGetUsersQuery from "../../hooks/use-get-users-query";
@@ -183,20 +184,28 @@ const columns = [
       <Typography variant="body2">{props.getValue()}</Typography>
     ),
   }),
-  columnHelper.display({
-    id: "actions",
-    meta: { name: "Actions", draggable: false },
-    minSize: 100,
-    enableHiding: false,
-    enableResizing: false,
-    enableSorting: false,
-    header: (props) => (
-      <TruncatedHeader maxWidth={props.column.getSize()}>
-        Actions
-      </TruncatedHeader>
-    ),
-    cell: (props) => (
-      <Button onClick={() => console.log(JSON.stringify(props.row))}>
+  // columnHelper.display({
+  //   id: "actions",
+  //   meta: { name: "Actions", draggable: false },
+  //   minSize: 100,
+  //   enableHiding: false,
+  //   enableResizing: false,
+  //   enableSorting: false,
+  //   header: (props) => (
+  //     <TruncatedHeader maxWidth={props.column.getSize()}>
+  //       Actions
+  //     </TruncatedHeader>
+  //   ),
+  //   cell: (props) => (
+  //     <Button onClick={() => console.log(JSON.stringify(props.row))}>
+  //       hello
+  //     </Button>
+  //   ),
+  // }),
+  createActionColDef<User>({
+    columnHelper,
+    cell: (ctx) => (
+      <Button onClick={() => console.log(JSON.stringify(ctx.row))}>
         hello
       </Button>
     ),
