@@ -1,4 +1,4 @@
-import UsersTable from "./components/table";
+import UsersTable from "./features/users/users-table";
 
 function App() {
   return (
