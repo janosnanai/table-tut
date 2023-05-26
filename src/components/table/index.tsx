@@ -9,17 +9,13 @@ import type {
   RowSelectionState,
   SortingState,
   VisibilityState,
-  // Updater,
 } from "@tanstack/react-table";
-// import type { User } from "../../mocks/db";
 
-import { useReducer, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
-  // Chip,
   Paper,
-  // Stack,
   Table as MUITable,
   TableBody,
   TableCell,
@@ -28,11 +24,9 @@ import {
   TableRow,
   TablePagination,
   TextField,
-  // Typography,
 } from "@mui/material";
 import {
   flexRender,
-  // functionalUpdate,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -40,13 +34,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-// import createAccessorColDef from "./column-def/accessor-col";
-// import createSelectColDef from "./column-def/select-col";
-// import createIndexColDef from "./column-def/index-col";
-// import createActionColDef from "./column-def/action-col";
 import ColumnHeader from "./column-header";
 import ViewMenu from "./view-menu";
-// import useGetUsersQuery from "../../hooks/use-get-users-query";
 import { useTimeout } from "../../hooks/use-timeout";
 import { PAGE_LIMITS } from "../../config";
 
@@ -57,100 +46,6 @@ declare module "@tanstack/react-table" {
   }
 }
 
-// const columns = [
-//   createSelectColDef<User>(),
-//   createIndexColDef<User>(),
-//   createAccessorColDef<User, string>({
-//     accessorKey: "fullName",
-//     header: "User",
-//     cell: (ctx) => (
-//       <Stack>
-//         <Box>
-//           <Typography
-//             variant="body1"
-//             sx={{ display: "inline-block", fontWeight: 700 }}
-//           >
-//             {ctx.getValue()}
-//           </Typography>
-//           {!ctx.row.original["active"] && (
-//             <Chip
-//               label="inactive"
-//               size="small"
-//               color="info"
-//               sx={{ display: "inline", ml: 1 }}
-//             />
-//           )}
-//         </Box>
-//         <Typography variant="body2">{ctx.row.original["username"]}</Typography>
-//         <Typography variant="caption" color="#777">
-//           {ctx.row.original["id"]}
-//         </Typography>
-//       </Stack>
-//     ),
-//     enableHiding: false,
-//     minSize: 150,
-//   }),
-//   createAccessorColDef<User, string>({
-//     accessorKey: "email",
-//     header: "E-mail",
-//     cell: (ctx) => (
-//       <Typography
-//         variant="body2"
-//         sx={{
-//           textOverflow: "ellipsis",
-//           overflow: "hidden",
-//           whiteSpace: "nowrap",
-//           maxWidth: ctx.column.getSize(),
-//         }}
-//       >
-//         {ctx.getValue()}
-//       </Typography>
-//     ),
-//   }),
-//   createAccessorColDef<User, string>({
-//     accessorKey: "group.name",
-//     header: "Group",
-//     cell: (ctx) => (
-//       <Stack>
-//         <Typography variant="body1">{ctx.getValue()}</Typography>
-//         <Typography variant="caption" color="#777">
-//           {ctx.row.original["group"]["id"]}
-//         </Typography>
-//       </Stack>
-//     ),
-//   }),
-//   createAccessorColDef<User, string>({
-//     accessorKey: "org.name",
-//     header: "Organization",
-//     cell: (ctx) => (
-//       <Stack>
-//         <Typography variant="body1">{ctx.getValue()}</Typography>
-//         <Typography variant="caption" color="#777">
-//           {ctx.row.original["org"]["id"]}
-//         </Typography>
-//       </Stack>
-//     ),
-//   }),
-//   createAccessorColDef<User, string>({
-//     accessorKey: "remark",
-//     header: "Remark",
-//     cell: (ctx) => <Typography variant="body2">{ctx.getValue()}</Typography>,
-//     enableSorting: false,
-//   }),
-//   createActionColDef<User>({
-//     cell: (ctx) => (
-//       <Button onClick={() => console.log(JSON.stringify(ctx.row))}>
-//         hello
-//       </Button>
-//     ),
-//   }),
-// ];
-
-// const initialPagination = {
-//   pageIndex: 0,
-//   pageSize: PAGE_LIMITS[0],
-// } as PaginationState;
-
 const defaultData = [] as any[];
 
 export interface DataOptionsState {
@@ -158,56 +53,6 @@ export interface DataOptionsState {
   sorting: [];
   filter: { global: string };
 }
-
-// const initialDataOptions = {
-//   pagination: initialPagination,
-//   sorting: [],
-//   filter: { global: "" },
-// } as DataOptionsState;
-
-// const enum DataOptionsActionType {
-//   SET_GLOBAL_FILTER = "SET_GLOBAL_FILTER",
-//   SET_GLOBAL_FILTER_SAFE_PAGINATION = "SET_GLOBAL_FILTER_SAFE_PAGINATION",
-//   SET_PAGINATION = "SET_PAGINATION",
-//   SET_SORTING = "SET_SORTING",
-// }
-
-// interface dataOptionsAction {
-//   type: DataOptionsActionType;
-//   payload: any;
-// }
-
-// function dataOptionsReducer(
-//   state: DataOptionsState,
-//   action: dataOptionsAction
-// ): DataOptionsState {
-//   switch (action.type) {
-//     case DataOptionsActionType.SET_GLOBAL_FILTER: {
-//       return {
-//         ...state,
-//         filter: { ...state.filter, global: action.payload },
-//       };
-//     }
-//     case DataOptionsActionType.SET_GLOBAL_FILTER_SAFE_PAGINATION: {
-//       return {
-//         ...state,
-//         filter: { ...state.filter, global: action.payload },
-//         pagination: { ...state.pagination, pageIndex: 0 },
-//       };
-//     }
-//     case DataOptionsActionType.SET_PAGINATION: {
-//       return {
-//         ...state,
-//         pagination: { ...action.payload },
-//       };
-//     }
-//     case DataOptionsActionType.SET_SORTING: {
-//       return { ...state, sorting: action.payload };
-//     }
-//     default:
-//       throw Error("Unknown action: " + action.type);
-//   }
-// }
 
 interface MyTableProps<T> {
   columns: ColumnDef<T, any>[];
@@ -242,47 +87,11 @@ function MyTable<T>({
     null
   );
 
-  // const [dataOptions, dispatchDataOptionsAction] = useReducer(
-  //   dataOptionsReducer,
-  //   initialDataOptions
-  // );
-
-  // function setGlobalFilter(update: string) {
-  //   dispatchDataOptionsAction({
-  //     type: DataOptionsActionType.SET_GLOBAL_FILTER,
-  //     payload: update,
-  //   });
-  // }
-
-  // function setPagination(updaterFn: Updater<PaginationState>) {
-  //   const prev = { ...dataOptions.pagination };
-  //   const update = functionalUpdate(updaterFn, prev);
-  //   dispatchDataOptionsAction({
-  //     type: DataOptionsActionType.SET_PAGINATION,
-  //     payload: update,
-  //   });
-  // }
-
-  // function setSorting(updaterFn: Updater<SortingState>) {
-  //   const prev = [...dataOptions.sorting];
-  //   const update = functionalUpdate(updaterFn, prev);
-  //   dispatchDataOptionsAction({
-  //     type: DataOptionsActionType.SET_SORTING,
-  //     payload: update,
-  //   });
-  // }
-
   const columnResizeMode: ColumnResizeMode = "onChange";
 
   const { startTimeout, stopTimeout } = useTimeout(() => {
-    // dispatchDataOptionsAction({
-    //   type: DataOptionsActionType.SET_GLOBAL_FILTER_SAFE_PAGINATION,
-    //   payload: globalFilterInput,
-    // });
     setGlobalFilter(globalFilterInput);
   });
-
-  // const { data: usersData } = useGetUsersQuery(dataOptions);
 
   const table = useReactTable({
     data: data || defaultData,
