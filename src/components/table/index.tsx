@@ -64,6 +64,7 @@ interface MyTableProps<T> {
   setGlobalFilter: OnChangeFn<any>;
   setPagination: OnChangeFn<PaginationState>;
   setSorting: OnChangeFn<SortingState>;
+  manualControl?: boolean;
 }
 
 function MyTable<T>({
@@ -76,6 +77,7 @@ function MyTable<T>({
   setGlobalFilter,
   setPagination,
   setSorting,
+  manualControl = false,
 }: MyTableProps<T>) {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     getDefaultColumnOrder()
@@ -113,9 +115,9 @@ function MyTable<T>({
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     enableRowSelection: true,
-    manualFiltering: true,
-    manualPagination: true,
-    manualSorting: true,
+    manualFiltering: manualControl,
+    manualPagination: manualControl,
+    manualSorting: manualControl,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
