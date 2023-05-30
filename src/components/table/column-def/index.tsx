@@ -35,12 +35,14 @@ function createColumnDefinitions<TData, TValue>({
     columnDefinitions.push(indexColDef);
   }
 
-  columnDefinitions.push(accessorColDefs);
+  columnDefinitions.push(...accessorColDefs);
 
   if (rowActions) {
     const actionColDef = createActionColDef<TData>({ cell: rowActions });
     columnDefinitions.push(actionColDef);
   }
+
+  return columnDefinitions;
 }
 
 export default createColumnDefinitions;
