@@ -1,8 +1,12 @@
-import type { CellContext, HeaderContext } from "@tanstack/react-table";
+import type {
+  CellContext,
+  ColumnDef,
+  HeaderContext,
+} from "@tanstack/react-table";
 
 import TruncatedHeader from "./header/truncated-header";
 
-interface AccessorColProps<TData, TValue> {
+export interface AccessorColProps<TData, TValue> {
   accessorKey: string;
   header: string;
   cell: (ctx: CellContext<TData, TValue>) => React.ReactNode;
@@ -32,7 +36,7 @@ function createAccessorColDef<TData, TValue>({
   minSize = 20,
   size,
   maxSize = Number.MAX_SAFE_INTEGER,
-}: AccessorColProps<TData, TValue>) {
+}: AccessorColProps<TData, TValue>): ColumnDef<TData, TValue> {
   return {
     accessorKey,
     header: (ctx: HeaderContext<TData, TValue>) => (

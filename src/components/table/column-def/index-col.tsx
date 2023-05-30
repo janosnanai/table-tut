@@ -1,6 +1,6 @@
-import type { CellContext } from "@tanstack/react-table";
+import type { CellContext, ColumnDef } from "@tanstack/react-table";
 
-function createIndexColDef<T>() {
+function createIndexColDef<T>(): ColumnDef<T> {
   return {
     id: "index",
     meta: { name: "Index", draggable: false },

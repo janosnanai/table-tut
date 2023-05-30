@@ -1,13 +1,20 @@
-import type { CellContext, HeaderContext } from "@tanstack/react-table";
+import type {
+  CellContext,
+  ColumnDef,
+  HeaderContext,
+} from "@tanstack/react-table";
 
 import TruncatedHeader from "./header/truncated-header";
 
-interface ActionColProps<T> {
+export interface ActionColProps<T> {
   cell: (ctx: CellContext<T, unknown>) => React.ReactNode;
   size?: number;
 }
 
-function createActionColDef<T>({ cell, size }: ActionColProps<T>) {
+function createActionColDef<T>({
+  cell,
+  size,
+}: ActionColProps<T>): ColumnDef<T> {
   return {
     id: "actions",
     meta: { name: "Actions", draggable: false },

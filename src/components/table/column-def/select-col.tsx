@@ -1,8 +1,12 @@
-import type { CellContext, HeaderContext } from "@tanstack/react-table";
+import type {
+  CellContext,
+  ColumnDef,
+  HeaderContext,
+} from "@tanstack/react-table";
 
 import { Checkbox } from "@mui/material";
 
-function createSelectColDef<T>() {
+function createSelectColDef<T>(): ColumnDef<T> {
   return {
     id: "select",
     meta: { name: "Select", draggable: false },
