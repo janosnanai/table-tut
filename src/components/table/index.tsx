@@ -175,6 +175,7 @@ function MyTable<T>({
             reset order
           </Button>
         </Paper>
+        <p>{JSON.stringify(table.getFilteredRowModel().rows.length)}</p>
         <TableContainer
           component={Paper}
           elevation={3}
@@ -217,7 +218,11 @@ function MyTable<T>({
           <TablePagination
             rowsPerPageOptions={PAGE_LIMITS}
             component="div"
-            count={count || -1}
+            count={
+              (manualControl
+                ? count
+                : table.getFilteredRowModel().rows.length) || -1
+            }
             rowsPerPage={pagination.pageSize}
             page={pagination.pageIndex}
             onPageChange={handlePageChange}

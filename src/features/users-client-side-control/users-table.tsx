@@ -12,11 +12,11 @@ import MyTable from "../../components/table";
 import userColumns from "./user-cols";
 import useGetUsersQuery from "../../hooks/use-get-users-query";
 
-import { PAGE_LIMITS } from "../../config";
+// import { PAGE_LIMITS } from "../../config";
 
 const initialPagination = {
   pageIndex: 0,
-  pageSize: PAGE_LIMITS[0],
+  pageSize: 200,
 } as PaginationState;
 
 const initialDataOptions = {
@@ -100,7 +100,7 @@ function UsersTable() {
     });
   }
 
-  const { data: usersData } = useGetUsersQuery(dataOptions);
+  const { data: usersData } = useGetUsersQuery(initialDataOptions);
 
   return (
     <MyTable
@@ -109,11 +109,11 @@ function UsersTable() {
       globalFilter={dataOptions.filter.global}
       pagination={dataOptions.pagination}
       sorting={dataOptions.sorting}
-      count={usersData?.pagination.count}
+      count={usersData?.data.length}
       setGlobalFilter={setGlobalFilter}
       setPagination={setPagination}
       setSorting={setSorting}
-      manualControl={true}
+      manualControl={false}
     />
   );
 }
