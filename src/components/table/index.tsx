@@ -9,6 +9,7 @@ import type {
   RowSelectionState,
   SortingState,
   VisibilityState,
+  Updater,
 } from "@tanstack/react-table";
 
 import { useState } from "react";
@@ -27,6 +28,7 @@ import {
 } from "@mui/material";
 import {
   flexRender,
+  functionalUpdate,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -62,8 +64,10 @@ interface MyTableProps<T> {
   pagination: PaginationState;
   sorting: SortingState;
   setGlobalFilter: OnChangeFn<any>;
-  setPagination: OnChangeFn<PaginationState>;
-  setSorting: OnChangeFn<SortingState>;
+  // setPagination: OnChangeFn<PaginationState>;
+  setPagination: (update: PaginationState) => void;
+  // setSorting: OnChangeFn<SortingState>;
+  setSorting: (update: SortingState) => void;
   manualControl?: boolean;
 }
 
@@ -111,9 +115,19 @@ function MyTable<T>({
     onColumnOrderChange: setColumnOrder,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
+    // onPaginationChange: setPagination,
+    onPaginationChange: (updaterFn: Updater<PaginationState>) => {
+      const prev = { ...pagination };
+      const update = functionalUpdate(updaterFn, prev);
+      setPagination(update);
+    },
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
+    // onSortingChange: setSorting,
+    onSortingChange: (updaterFn: Updater<SortingState>) => {
+      const prev = [...sorting];
+      const update = functionalUpdate(updaterFn, prev);
+      setSorting(update);
+    },
     enableRowSelection: true,
     manualFiltering: manualControl,
     manualPagination: manualControl,
@@ -175,7 +189,6 @@ function MyTable<T>({
             reset order
           </Button>
         </Paper>
-        <p>{JSON.stringify(table.getFilteredRowModel().rows.length)}</p>
         <TableContainer
           component={Paper}
           elevation={3}
