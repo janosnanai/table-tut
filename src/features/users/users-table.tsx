@@ -1,12 +1,7 @@
-import type {
-  PaginationState,
-  SortingState,
-  // Updater,
-} from "@tanstack/react-table";
+import type { PaginationState, SortingState } from "@tanstack/react-table";
 import type { DataOptionsState } from "../../components/table";
 
 import { useReducer } from "react";
-// import { functionalUpdate } from "@tanstack/react-table";
 
 import MyTable from "../../components/table";
 import userColumns from "./user-cols";
@@ -82,34 +77,14 @@ function UsersTable() {
     });
   }
 
-  // function setPagination(updaterFn: Updater<PaginationState>) {
-  //   const prev = { ...dataOptions.pagination };
-  //   const update = functionalUpdate(updaterFn, prev);
-  //   dispatchDataOptionsAction({
-  //     type: DataOptionsActionType.SET_PAGINATION,
-  //     payload: update,
-  //   });
-  // }
   function setPagination(update: PaginationState) {
-    // const prev = { ...dataOptions.pagination };
-    // const update = functionalUpdate(updaterFn, prev);
     dispatchDataOptionsAction({
       type: DataOptionsActionType.SET_PAGINATION,
       payload: update,
     });
   }
 
-  // function setSorting(updaterFn: Updater<SortingState>) {
-  //   const prev = [...dataOptions.sorting];
-  //   const update = functionalUpdate(updaterFn, prev);
-  //   dispatchDataOptionsAction({
-  //     type: DataOptionsActionType.SET_SORTING,
-  //     payload: update,
-  //   });
-  // }
   function setSorting(update: SortingState) {
-    // const prev = [...dataOptions.sorting];
-    // const update = functionalUpdate(updaterFn, prev);
     dispatchDataOptionsAction({
       type: DataOptionsActionType.SET_SORTING,
       payload: update,
